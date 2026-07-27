@@ -283,9 +283,14 @@
               <h2 data-i18n="saved_orders_title">الطلبات المحفوظة</h2>
               <span class="card-header-line" aria-hidden="true"></span>
             </div>
-            <button id="export-csv-btn" class="btn btn-outline-sm" type="button">
-              📥 <span data-i18n="btn_export_csv">تصدير Excel</span>
-            </button>
+            <div class="export-btn-group">
+              <button id="export-report-btn" class="btn btn-primary-sm" type="button">
+                🖨️ <span data-i18n="btn_export_report">تصدير تقرير رسمي</span>
+              </button>
+              <button id="export-csv-btn" class="btn btn-outline-sm" type="button">
+                📊 <span data-i18n="btn_export_csv">تصدير Excel</span>
+              </button>
+            </div>
           </div>
 
           <!-- أدوات البحث والتصفية -->
@@ -316,7 +321,7 @@
   <!-- إشعار توست (Toast Notification) -->
   <div id="toast" class="toast hidden"></div>
 
-  <!-- ===================== الفاتورة الرسمية للطباعة (Printable Invoice Template) ===================== -->
+  <!-- ===================== الفاتورة الرسمية والتقرير للطباعة والتصدير ===================== -->
   <div id="print-area" class="print-area"></div>
 
   <!-- قالب بطاقة الطلب الواحدة -->
@@ -340,7 +345,7 @@
       <div class="order-item-actions">
         <button class="btn btn-whatsapp-mini" type="button">إرسال عبر واتساب</button>
         <button class="btn btn-copy-mini" type="button">📋 <span class="lbl-copy">نسخ</span></button>
-        <button class="btn btn-print-mini" type="button">🖨️ <span class="lbl-print">طباعة</span></button>
+        <button class="btn btn-print-mini" type="button">🖨️ <span class="lbl-print">طباعة الفاتورة</span></button>
         <button class="btn btn-delete-mini" type="button">حذف</button>
       </div>
       <div class="perforated-edge small" aria-hidden="true"></div>

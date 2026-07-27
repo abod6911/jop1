@@ -78,6 +78,7 @@ const TRANSLATIONS = {
     btn_send_whatsapp: "إرسال الطلب عبر واتساب",
     saved_orders_title: "الطلبات المحفوظة",
     btn_export_csv: "تصدير Excel",
+    btn_export_report: "تصدير تقرير رسمي",
     placeholder_search: "🔍 بحث في الطلبات (الاسم، الشركة، الجوال)...",
     filter_all: "الكل",
     filter_interested: "🔥 مهتم",
@@ -176,6 +177,7 @@ const TRANSLATIONS = {
     btn_send_whatsapp: "Send via WhatsApp",
     saved_orders_title: "Saved Orders",
     btn_export_csv: "Export Excel",
+    btn_export_report: "Export Report",
     placeholder_search: "🔍 Search orders (Name, Company, Phone)...",
     filter_all: "All",
     filter_interested: "🔥 Interested",
@@ -379,6 +381,7 @@ const printAreaEl = document.getElementById("print-area");
 
 const searchOrdersInput = document.getElementById("search-orders");
 const exportCsvBtn = document.getElementById("export-csv-btn");
+const exportReportBtn = document.getElementById("export-report-btn");
 
 if (langToggleLogin) langToggleLogin.addEventListener("click", toggleLanguage);
 if (langToggleDash) langToggleDash.addEventListener("click", toggleLanguage);
@@ -634,7 +637,6 @@ sendWhatsappBtn.addEventListener("click", function () {
    طباعة وتصدير الفاتورة الرسمية الفخمة بالهوية المعتمدة والـ QR
    ========================================================= */
 function printOrderReceipt(order) {
-  const t = TRANSLATIONS[currentLang];
   const isAr = currentLang === "ar";
 
   const followupFormatted = order.followupDate
@@ -730,6 +732,121 @@ function printOrderReceipt(order) {
 
   printAreaEl.innerHTML = printHtml;
   window.print();
+}
+
+/* =========================================================
+   تصدير التقرير التنفيذي الشامل لجميع الطلبات كـ PDF/طباعة
+   ========================================================= */
+function printAllOrdersReport() {
+  const orders = getOrders();
+  if (orders.length === 0) return;
+
+  const isAr = currentLang === "ar";
+  const total = orders.length;
+  const interested = orders.filter(o => o.optInterested).length;
+  const morning = orders.filter(o => o.optManagerMorning).length;
+  const sendManager = orders.filter(o => o.optSendToManager).length;
+
+  let tableRows = "";
+  orders.forEach((o, index) => {
+    const followupFormatted = o.followupDate
+      ? new Date(o.followupDate).toLocaleString(isAr ? "ar-SA" : "en-US")
+      : "-";
+
+    const interestedBadge = `<span class="report-badge ${o.optInterested ? 'yes' : 'no'}">🔥 ${o.optInterested ? (isAr ? "نعم" : "Yes") : (isAr ? "لا" : "No")}</span>`;
+    const morningBadge = `<span class="report-badge ${o.optManagerMorning ? 'yes' : 'no'}">☀️ ${o.optManagerMorning ? (isAr ? "نعم" : "Yes") : (isAr ? "لا" : "No")}</span>`;
+    const managerBadge = `<span class="report-badge ${o.optSendToManager ? 'yes' : 'no'}">📩 ${o.optSendToManager ? (isAr ? "نعم" : "Yes") : (isAr ? "لا" : "No")}</span>`;
+
+    tableRows += `
+      <tr>
+        <td>#${index + 1}</td>
+        <td><strong>${o.name}</strong></td>
+        <td>${o.company || "-"}</td>
+        <td>${o.phone}</td>
+        <td>${o.location}</td>
+        <td>${followupFormatted}</td>
+        <td>${interestedBadge} ${morningBadge} ${managerBadge}</td>
+        <td>${o.details}</td>
+      </tr>
+    `;
+  });
+
+  const reportHtml = `
+    <div class="report-container">
+      <div class="report-header">
+        <div class="invoice-brand-block">
+          <div class="invoice-seal"><span>م</span></div>
+          <div class="invoice-title-text">
+            <h1>${isAr ? "مؤسسة مهاب لإدارة الخدمات والطلبات" : "Muhab Enterprise for Order Services"}</h1>
+            <p>${isAr ? "تقرير الإدارة التنفيذي لطلبات وسجلات العملاء" : "Executive Management Orders Summary Report"}</p>
+          </div>
+        </div>
+        <div class="invoice-doc-meta">
+          <div class="invoice-doc-type">${isAr ? "تقرير الطلبات الشامل" : "Executive Orders Report"}</div>
+          <div class="invoice-meta-row">${isAr ? "التاريخ:" : "Date:"} ${new Date().toLocaleString(isAr ? "ar-SA" : "en-US")}</div>
+        </div>
+      </div>
+
+      <div class="report-summary-bar">
+        <div class="report-stat-item">
+          <div class="report-stat-num">${total}</div>
+          <div class="report-stat-lbl">${isAr ? "إجمالي الطلبات" : "Total Orders"}</div>
+        </div>
+        <div class="report-stat-item">
+          <div class="report-stat-num">${interested}</div>
+          <div class="report-stat-lbl">${isAr ? "العملاء المهتمين" : "Interested Clients"}</div>
+        </div>
+        <div class="report-stat-item">
+          <div class="report-stat-num">${morning}</div>
+          <div class="report-stat-lbl">${isAr ? "تواجد المدير صباحاً" : "Morning Manager"}</div>
+        </div>
+        <div class="report-stat-item">
+          <div class="report-stat-num">${sendManager}</div>
+          <div class="report-stat-lbl">${isAr ? "الرفع للمدير" : "Forward to Manager"}</div>
+        </div>
+      </div>
+
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>${isAr ? "اسم العميل" : "Customer"}</th>
+            <th>${isAr ? "اسم الشركة" : "Company"}</th>
+            <th>${isAr ? "الجوال" : "Phone"}</th>
+            <th>${isAr ? "الموقع" : "Location"}</th>
+            <th>${isAr ? "المتابعة" : "Follow-up"}</th>
+            <th>${isAr ? "التصنيفات" : "Tags"}</th>
+            <th>${isAr ? "تفاصيل الطلب" : "Details"}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+
+      <div class="invoice-footer-block">
+        <div class="invoice-sign-box">
+          <div>${isAr ? "توقيع مدير المبيعات والعمليات" : "Sales Manager Signature"}</div>
+          <div class="invoice-sign-line"></div>
+        </div>
+        <div class="invoice-watermark-stamp">
+          <div>مؤسسة مهاب</div>
+          <div>تقرير معتمد</div>
+        </div>
+        <div class="invoice-sign-box">
+          <div>${isAr ? "اعتماد الإدارة العامة والختم" : "General Management Stamp"}</div>
+          <div class="invoice-sign-line"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  printAreaEl.innerHTML = reportHtml;
+  window.print();
+}
+
+if (exportReportBtn) {
+  exportReportBtn.addEventListener("click", printAllOrdersReport);
 }
 
 /* =========================================================

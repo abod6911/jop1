@@ -434,6 +434,20 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 .btn-primary:hover{ background: var(--teal-mid); }
 
+.btn-primary-sm {
+  background: var(--teal-deep);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+}
+.btn-primary-sm:hover {
+  background: var(--teal-mid);
+}
+
 .btn-secondary{
   background: var(--gold);
   color:#1a1305;
@@ -459,6 +473,12 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   background: var(--teal-deep);
   color: #fff;
   border-color: var(--teal-deep);
+}
+
+.export-btn-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .btn-theme {
@@ -862,7 +882,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 
 /* =========================================================
-   تنسيق الفاتورة الرسمية الاحترافية للطباعة (@media print)
+   تنسيق الفاتورة الرسمية والتقرير للطباعة والتصدير (@media print)
    ========================================================= */
 .print-area { display: none; }
 
@@ -880,6 +900,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     font-family: "Tajawal", sans-serif !important;
   }
 
+  /* --- سند الطلب الفردي --- */
   .invoice-card {
     border: 2px solid #0E3D3B;
     border-radius: 12px;
@@ -892,7 +913,6 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     page-break-inside: avoid;
   }
 
-  /* الترويسة العليا بالهوية الرسمية ومربع الـ QR Code المحاكي */
   .invoice-header {
     display: flex;
     align-items: center;
@@ -943,7 +963,6 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     gap: 16px;
   }
 
-  /* محاكي QR Code للتحقق الرقمي */
   .invoice-qr-code {
     width: 72px;
     height: 72px;
@@ -991,7 +1010,6 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     color: #C6952E;
   }
 
-  /* جدول بيانات العميل والشركة المنسق */
   .invoice-grid-table {
     width: 100%;
     border-collapse: collapse;
@@ -1015,7 +1033,6 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     width: 28%;
   }
 
-  /* قسم تصنيف العميل والملاحظات */
   .invoice-section-heading {
     font-family: "Reem Kufi", sans-serif;
     font-size: 1.05rem;
@@ -1060,7 +1077,6 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   .invoice-class-val.yes { color: #22A85C; }
   .invoice-class-val.no { color: #C0392B; }
 
-  /* صندوق التفاصيل */
   .invoice-details-card {
     background: #FCFDFC;
     border: 1.5px solid #DDE6E1;
@@ -1073,7 +1089,6 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     color: #16302C;
   }
 
-  /* تذييل الفاتورة والتواضيع */
   .invoice-footer-block {
     margin-top: 36px;
     display: flex;
@@ -1111,6 +1126,77 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     transform: rotate(-10deg);
     opacity: 0.88;
   }
+
+  /* --- التقرير الشامل لجميع الطلبات --- */
+  .report-container {
+    padding: 28px 36px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #FFF !important;
+  }
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #C6952E;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .report-summary-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    background: #F4F7F5;
+    border: 1px solid #DDE6E1;
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
+  }
+  .report-stat-item {
+    text-align: center;
+  }
+  .report-stat-num {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #0E3D3B;
+  }
+  .report-stat-lbl {
+    font-size: 0.76rem;
+    color: #52685F;
+  }
+  .report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+  }
+  .report-table th {
+    background: #0E3D3B;
+    color: #FFF;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    font-family: "Reem Kufi", sans-serif;
+    text-align: start;
+    border: 1px solid #0E3D3B;
+  }
+  .report-table td {
+    padding: 9px 12px;
+    border: 1px solid #DDE6E1;
+    font-size: 0.83rem;
+    vertical-align: top;
+  }
+  .report-table tr:nth-child(even) td {
+    background: #F8FAF9;
+  }
+  .report-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 1px;
+  }
+  .report-badge.yes { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+  .report-badge.no { background: #FFEBEE; color: #C62828; border: 1px solid #EF9A9A; }
 }
 
 /* =========================================================
