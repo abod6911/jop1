@@ -1,0 +1,663 @@
+/* =========================================================
+   نظام الألوان والخطوط (Design Tokens)
+   ========================================================= */
+:root{
+  --teal-deep:   #0E3D3B;   /* أخضر داكن مطفي: لون العلامة التجارية الأساسي */
+  --teal-mid:    #14554F;
+  --teal-soft:   #1E6F66;
+  --gold:        #C6952E;   /* لون ذهبي مطفي: لون التمييز والأزرار الأساسية */
+  --gold-light:  #E7C877;
+  --ink:         #16302C;   /* لون النص الأساسي الداكن */
+  --ink-soft:    #52685F;
+  --bg:          #F4F7F5;   /* خلفية الصفحة */
+  --card:        #FFFFFF;
+  --border:      #DDE6E1;
+  --danger:      #C0392B;
+  --whatsapp:    #22A85C;
+  --whatsapp-dark:#1C8E4D;
+  --shadow: 0 10px 30px -12px rgba(14, 61, 59, 0.25);
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 9px;
+
+  --font-display: "Reem Kufi", "Tajawal", sans-serif;
+  --font-body: "Tajawal", "Outfit", sans-serif;
+}
+
+/* نمط الخطوط في حالة الإنجليزية */
+html[lang="en"] {
+  --font-display: "Outfit", "Tajawal", sans-serif;
+  --font-body: "Outfit", "Tajawal", sans-serif;
+}
+
+*{ box-sizing: border-box; }
+
+html, body{
+  margin:0;
+  padding:0;
+  min-height:100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+body{
+  position: relative;
+  overflow-x: hidden;
+}
+
+.hidden{ display:none !important; }
+
+button{ font-family: inherit; cursor:pointer; }
+input, textarea{ font-family: inherit; }
+
+/* =========================================================
+   ختم العلامة المائية في خلفية الصفحة
+   ========================================================= */
+.brand-watermark{
+  position: fixed;
+  inset: 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  z-index:0;
+  opacity:0.035;
+}
+.stamp-ring{
+  width: 620px;
+  height:620px;
+  max-width: 90vw;
+  max-height: 90vw;
+  border-radius:50%;
+  border: 3px dashed var(--teal-deep);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.stamp-text{
+  font-family: var(--font-display);
+  font-size: 9rem;
+  color: var(--teal-deep);
+}
+
+/* =========================================================
+   صفحة تسجيل الدخول / التسجيل
+   ========================================================= */
+.auth-page{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 32px 16px;
+}
+
+.auth-wrapper{
+  width:100%;
+  max-width: 980px;
+  display:grid;
+  grid-template-columns: 1fr 1.15fr;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  overflow:hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+/* --- اللوحة اليمنى: هوية الشركة --- */
+.auth-brand{
+  position:relative;
+  background: linear-gradient(160deg, var(--teal-deep), var(--teal-mid) 60%, var(--teal-soft));
+  color:#fff;
+  padding: 48px 40px 64px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  justify-content:center;
+}
+
+.brand-seal{
+  width:78px;
+  height:78px;
+  border-radius:50%;
+  border: 2.5px solid var(--gold-light);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:18px;
+  background: rgba(255,255,255,0.05);
+}
+.brand-seal span{
+  font-family: var(--font-display);
+  font-size: 2.1rem;
+  color: var(--gold-light);
+}
+.brand-seal.small{
+  width:44px; height:44px; margin-bottom:0;
+}
+.brand-seal.small span{ font-size: 1.2rem; }
+
+.brand-name{
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  margin: 0 0 8px;
+  letter-spacing: 1px;
+}
+
+.brand-tagline{
+  color: rgba(255,255,255,0.85);
+  font-size: 0.98rem;
+  max-width: 320px;
+  margin: 0 0 28px;
+  line-height:1.8;
+}
+
+.brand-points{
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  text-align:start;
+}
+.brand-points li{
+  position:relative;
+  padding-inline-start: 24px;
+  font-size:0.92rem;
+  color: rgba(255,255,255,0.9);
+}
+.brand-points li::before{
+  content:"◆";
+  position:absolute;
+  inset-inline-start:0;
+  color: var(--gold-light);
+  font-size:0.7rem;
+  top:5px;
+}
+
+/* خط منقط أسفل اللوحة يشبه حافة إيصال مقصوصة */
+.perforated-edge{
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:14px;
+  background-image: radial-gradient(circle at 10px 0, var(--bg) 6px, transparent 7px);
+  background-size: 20px 14px;
+  background-repeat: repeat-x;
+}
+.perforated-edge.small{
+  position:static;
+  margin-top:14px;
+  height:10px;
+  background-image: radial-gradient(circle at 8px 0, var(--card) 5px, transparent 6px);
+  background-size:16px 10px;
+}
+
+/* --- اللوحة اليسرى: نموذج الدخول --- */
+.auth-form-panel{
+  padding: 36px 40px;
+  display:flex;
+  flex-direction:column;
+}
+
+.panel-header-actions{
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom: 12px;
+}
+
+.tabs{
+  display:flex;
+  gap:6px;
+  background: var(--bg);
+  padding:5px;
+  border-radius: 999px;
+  margin-bottom: 24px;
+}
+.tab-btn{
+  flex:1;
+  border:none;
+  background:transparent;
+  padding: 10px 14px;
+  border-radius:999px;
+  font-size:0.92rem;
+  font-weight:700;
+  color: var(--ink-soft);
+  transition: all .2s ease;
+}
+.tab-btn.active{
+  background: var(--teal-deep);
+  color:#fff;
+  box-shadow: 0 4px 10px -4px rgba(14,61,59,0.5);
+}
+
+.form-title{
+  font-family: var(--font-display);
+  font-size:1.6rem;
+  margin: 0 0 4px;
+}
+.form-subtitle{
+  color: var(--ink-soft);
+  font-size:0.9rem;
+  margin: 0 0 22px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:16px;
+}
+.field-label{
+  font-size:0.85rem;
+  font-weight:700;
+  color: var(--ink);
+}
+.field input, .field textarea{
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  background: #FCFDFC;
+  color: var(--ink);
+  outline:none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.field input:focus, .field textarea:focus{
+  border-color: var(--teal-soft);
+  box-shadow: 0 0 0 3px rgba(30,111,102,0.15);
+}
+.field textarea{ resize: vertical; min-height: 100px; }
+
+.form-error{
+  color: var(--danger);
+  font-size:0.85rem;
+  min-height:1.1em;
+  margin: 0 0 10px;
+}
+.form-success{
+  color: var(--whatsapp-dark);
+  font-size:0.85rem;
+  min-height:1.1em;
+  margin: -6px 0 10px;
+}
+
+/* =========================================================
+   قسم تصنيف ونوعية العميل (Checkboxes)
+   ========================================================= */
+.classification-box {
+  background: #F8FAF9;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 16px 0 20px;
+}
+
+.classification-title {
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--teal-deep);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.classification-title::before {
+  content: "📌";
+  font-size: 0.9rem;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  color: var(--ink);
+  transition: color 0.15s ease;
+}
+
+.checkbox-label:hover {
+  color: var(--teal-deep);
+}
+
+.checkbox-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-custom::after {
+  content: "";
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+  background: var(--teal-soft);
+  border-color: var(--teal-soft);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.checkbox-label input[type="checkbox"]:focus-visible + .checkbox-custom {
+  box-shadow: 0 0 0 3px rgba(30,111,102,0.2);
+}
+
+/* =========================================================
+   الأزرار وزر اللغة
+   ========================================================= */
+.btn{
+  border:none;
+  border-radius: var(--radius-sm);
+  padding: 13px 20px;
+  font-size:0.95rem;
+  font-weight:700;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  transition: transform .12s ease, box-shadow .12s ease, background .15s ease;
+}
+.btn:active{ transform: scale(0.98); }
+
+.btn-block{ width:100%; }
+
+.btn-primary{
+  background: var(--teal-deep);
+  color:#fff;
+}
+.btn-primary:hover{ background: var(--teal-mid); }
+
+.btn-secondary{
+  background: var(--gold);
+  color:#1a1305;
+}
+.btn-secondary:hover{ background: var(--gold-light); }
+
+.btn-ghost{
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--ink);
+}
+.btn-ghost:hover{ border-color: var(--teal-soft); color: var(--teal-deep); }
+
+.btn-lang {
+  background: #F0F4F2;
+  border: 1px solid var(--border);
+  color: var(--teal-deep);
+  padding: 7px 14px;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+.btn-lang:hover {
+  background: var(--teal-deep);
+  color: #fff;
+  border-color: var(--teal-deep);
+}
+.lang-icon { font-size: 1rem; }
+
+.btn-whatsapp{
+  background: var(--whatsapp);
+  color:#fff;
+}
+.btn-whatsapp:hover{ background: var(--whatsapp-dark); }
+.wa-icon{ width:19px; height:19px; }
+
+.btn-whatsapp-mini{
+  background: var(--whatsapp);
+  color:#fff;
+  padding: 8px 14px;
+  font-size:0.82rem;
+  border-radius: 999px;
+}
+.btn-whatsapp-mini:hover{ background: var(--whatsapp-dark); }
+
+.btn-delete-mini{
+  background: transparent;
+  color: var(--danger);
+  border: 1.5px solid rgba(192,57,43,0.35);
+  padding: 8px 14px;
+  font-size:0.82rem;
+  border-radius: 999px;
+}
+.btn-delete-mini:hover{ background: rgba(192,57,43,0.08); }
+
+/* =========================================================
+   لوحة التحكم
+   ========================================================= */
+.dashboard-page{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  padding-bottom: 60px;
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 16px 32px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+.topbar-brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.topbar-title{
+  font-family: var(--font-display);
+  font-size:1.3rem;
+  margin:0;
+  color: var(--teal-deep);
+}
+.topbar-subtitle{
+  font-size:0.78rem;
+  color: var(--ink-soft);
+  margin:0;
+}
+.topbar-user{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.welcome-text{
+  font-size:0.9rem;
+  color: var(--ink-soft);
+  font-weight:500;
+}
+
+.dashboard-grid{
+  max-width: 1180px;
+  margin: 32px auto 0;
+  padding: 0 32px;
+  display:grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 24px;
+  align-items:start;
+}
+
+.card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.card-header{
+  margin-bottom: 22px;
+}
+.card-header h2{
+  font-family: var(--font-display);
+  font-size:1.25rem;
+  margin:0 0 8px;
+  color: var(--teal-deep);
+}
+.card-header-line{
+  display:block;
+  width:52px;
+  height:4px;
+  border-radius:4px;
+  background: var(--gold);
+}
+
+.order-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:8px;
+}
+.order-actions .btn{ flex:1; min-width: 160px; }
+
+/* --- حالة عدم وجود طلبات --- */
+.empty-state{
+  text-align:center;
+  padding: 40px 10px;
+  color: var(--ink-soft);
+}
+.empty-state p{ margin:4px 0; }
+.empty-hint{ font-size:0.85rem; opacity:0.8; }
+
+/* --- قائمة الطلبات --- */
+.orders-list{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  max-height: 640px;
+  overflow-y:auto;
+  padding-inline-end: 4px;
+}
+
+.order-item{
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 18px 4px;
+  background: #FBFDFC;
+}
+.order-item-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+.order-item-name{
+  font-weight:800;
+  color: var(--teal-deep);
+  font-size:1.02rem;
+}
+.order-item-date{
+  font-size:0.75rem;
+  color: var(--ink-soft);
+}
+.order-item-row{
+  margin: 4px 0;
+  font-size:0.88rem;
+  color: var(--ink);
+}
+.order-item-details{
+  margin: 8px 0 4px;
+  font-size:0.88rem;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  line-height:1.7;
+}
+
+/* شارات تصنيف العميل في البطاقة المحفوظة */
+.order-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 6px;
+}
+.tag-badge {
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tag-badge.active {
+  background: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #A5D6A7;
+}
+.tag-badge.inactive {
+  background: #F5F5F5;
+  color: #757575;
+  border: 1px solid #E0E0E0;
+}
+
+.order-item-actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+  flex-wrap:wrap;
+}
+
+/* =========================================================
+   الاستجابة للشاشات الصغيرة (موبايل)
+   ========================================================= */
+@media (max-width: 860px){
+  .auth-wrapper{ grid-template-columns: 1fr; }
+  .auth-brand{ padding: 36px 28px 44px; }
+  .brand-name{ font-size:2.2rem; }
+  .dashboard-grid{ grid-template-columns: 1fr; padding: 0 16px; }
+  .stamp-text{ font-size:6rem; }
+}
+
+@media (max-width: 480px){
+  .auth-form-panel{ padding: 28px 18px; }
+  .topbar{ padding: 12px 16px; }
+  .topbar-title{ font-size:1.1rem; }
+  .welcome-text{ display:none; }
+  .order-actions .btn{ min-width: 100%; }
+  .card{ padding: 20px; }
+}
+
+/* إخفاء شريط التمرير الافتراضي وتحسين شكله */
+.orders-list::-webkit-scrollbar{ width:6px; }
+.orders-list::-webkit-scrollbar-thumb{ background: var(--border); border-radius:6px; }
