@@ -313,6 +313,69 @@ input, textarea, select{ font-family: inherit; }
 }
 
 /* =========================================================
+   وسوم الفئات والأولوية (Category Priority Badges)
+   ========================================================= */
+.category-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+}
+
+.category-badge.vip {
+  background: #FEE2E2;
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+}
+.category-badge.new {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #86EFAC;
+}
+.category-badge.service {
+  background: #DBEAFE;
+  color: #1D4ED8;
+  border: 1px solid #93C5FD;
+}
+.category-badge.inquiry {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+[data-theme="dark"] .category-badge.vip {
+  background: rgba(220, 38, 38, 0.2);
+  color: #FCA5A5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+[data-theme="dark"] .category-badge.new {
+  background: rgba(22, 101, 52, 0.2);
+  color: #86EFAC;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+[data-theme="dark"] .category-badge.service {
+  background: rgba(30, 64, 175, 0.2);
+  color: #93C5FD;
+  border-color: rgba(59, 130, 246, 0.4);
+}
+[data-theme="dark"] .category-badge.inquiry {
+  background: rgba(180, 83, 9, 0.2);
+  color: #FDE68A;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.order-item-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+/* =========================================================
    قسم المفاتيح الحديثة لتصنيف العميل (Modern Switches)
    ========================================================= */
 .classification-box {
@@ -900,7 +963,6 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     font-family: "Tajawal", sans-serif !important;
   }
 
-  /* --- سند الطلب الفردي --- */
   .invoice-card {
     border: 2px solid #0E3D3B;
     border-radius: 12px;

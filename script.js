@@ -54,6 +54,7 @@ const TRANSLATIONS = {
     stat_morning: "تواجد المدير صباحاً",
     stat_send_manager: "إرسال للمدير",
     stat_followup: "تذكير ومتابعة",
+    stat_vip: "طلبات VIP عاجلة",
     new_order_title: "طلب جديد",
     label_customer_name: "اسم العميل",
     placeholder_customer_name: "مثال: أحمد محمد",
@@ -63,6 +64,11 @@ const TRANSLATIONS = {
     placeholder_customer_phone: "مثال: 05xxxxxxxx",
     label_location: "الموقع / العنوان",
     placeholder_location: "الحي، الشارع، أقرب معلم",
+    label_order_category: "فئة وتصنيف الأولوية",
+    category_vip: "🔴 VIP / عاجل جداً",
+    category_new: "🟢 عميل جديد",
+    category_service: "🔵 تركيب وصيانة",
+    category_inquiry: "🟡 استفسار ومتابعة",
     label_followup_date: "موعد وتاريخ المتابعة",
     label_wa_template: "قالب رسالة الواتساب",
     template_full: "📌 طلب جديد شامل",
@@ -81,6 +87,7 @@ const TRANSLATIONS = {
     btn_export_report: "تصدير تقرير رسمي",
     placeholder_search: "🔍 بحث في الطلبات (الاسم، الشركة، الجوال)...",
     filter_all: "الكل",
+    filter_vip: "🔴 VIP",
     filter_interested: "🔥 مهتم",
     filter_morning: "☀️ صباحاً",
     filter_manager: "📩 للمدير",
@@ -111,6 +118,7 @@ const TRANSLATIONS = {
     wa_manager_morning: "• المدير موجود صباحاً:",
     wa_send_to_manager: "• إرسال التفاصيل للمدير:",
     wa_followup_label: "📅 *تاريخ موعد المتابعة:*",
+    wa_category_label: "🏷️ *فئة الأولوية:*",
     tag_interested: "متحمس للفكرة",
     tag_manager_morning: "المدير صباحاً",
     tag_send_manager: "إرسال للمدير"
@@ -153,6 +161,7 @@ const TRANSLATIONS = {
     stat_morning: "Morning Manager",
     stat_send_manager: "Send to Manager",
     stat_followup: "Reminders & Follow-ups",
+    stat_vip: "Urgent VIP Orders",
     new_order_title: "New Order",
     label_customer_name: "Customer Name",
     placeholder_customer_name: "e.g. John Doe",
@@ -162,6 +171,11 @@ const TRANSLATIONS = {
     placeholder_customer_phone: "e.g. 05xxxxxxxx",
     label_location: "Location / Address",
     placeholder_location: "District, street, nearest landmark",
+    label_order_category: "Priority Category",
+    category_vip: "🔴 VIP / Urgent",
+    category_new: "🟢 New Lead",
+    category_service: "🔵 Service & Install",
+    category_inquiry: "🟡 General Inquiry",
     label_followup_date: "Follow-up Date & Time",
     label_wa_template: "WhatsApp Message Template",
     template_full: "📌 Full New Order",
@@ -180,6 +194,7 @@ const TRANSLATIONS = {
     btn_export_report: "Export Report",
     placeholder_search: "🔍 Search orders (Name, Company, Phone)...",
     filter_all: "All",
+    filter_vip: "🔴 VIP",
     filter_interested: "🔥 Interested",
     filter_morning: "☀️ Morning",
     filter_manager: "📩 To Manager",
@@ -210,6 +225,7 @@ const TRANSLATIONS = {
     wa_manager_morning: "• Manager present morning:",
     wa_send_to_manager: "• Send details to manager:",
     wa_followup_label: "📅 *Follow-up Date:*",
+    wa_category_label: "🏷️ *Priority Category:*",
     tag_interested: "Interested in Idea",
     tag_manager_morning: "Manager Morning",
     tag_send_manager: "Send to Manager"
@@ -283,13 +299,13 @@ function updateStats() {
   const interested = orders.filter(o => o.optInterested).length;
   const morning = orders.filter(o => o.optManagerMorning).length;
   const sendManager = orders.filter(o => o.optSendToManager).length;
-  const followup = orders.filter(o => o.followupDate).length;
+  const vipCount = orders.filter(o => o.category === "vip").length;
 
   document.getElementById("stat-total").textContent = total;
   document.getElementById("stat-interested").textContent = interested;
   document.getElementById("stat-morning").textContent = morning;
   document.getElementById("stat-send-manager").textContent = sendManager;
-  document.getElementById("stat-followup").textContent = followup;
+  document.getElementById("stat-vip").textContent = vipCount;
 }
 
 /* =========================================================
@@ -507,7 +523,7 @@ function showLoginPage() {
 }
 
 /* =========================================================
-   قراءة بيانات نموذج الطلب
+   قراءة بيانات نموذج الطلب (شاملاً فئة الأولوية)
    ========================================================= */
 function readOrderFormData() {
   return {
@@ -515,6 +531,7 @@ function readOrderFormData() {
     company: document.getElementById("customer-company").value.trim(),
     phone: document.getElementById("customer-phone").value.trim(),
     location: document.getElementById("customer-location").value.trim(),
+    category: document.getElementById("order-category").value,
     followupDate: document.getElementById("followup-date").value,
     waTemplate: document.getElementById("wa-template").value,
     details: document.getElementById("order-details").value.trim(),
@@ -551,6 +568,7 @@ orderForm.addEventListener("submit", function (e) {
     company: data.company,
     phone: data.phone,
     location: data.location,
+    category: data.category || "new",
     followupDate: data.followupDate,
     waTemplate: data.waTemplate,
     details: data.details,
@@ -571,6 +589,14 @@ orderForm.addEventListener("submit", function (e) {
 /* =========================================================
    تنسيق رسالة واتساب
    ========================================================= */
+function getCategoryLabel(catKey) {
+  const t = TRANSLATIONS[currentLang];
+  if (catKey === "vip") return t.category_vip;
+  if (catKey === "service") return t.category_service;
+  if (catKey === "inquiry") return t.category_inquiry;
+  return t.category_new;
+}
+
 function buildWhatsappMessage(data) {
   const t = TRANSLATIONS[currentLang];
   const yesStr = t.yes;
@@ -595,6 +621,8 @@ function buildWhatsappMessage(data) {
     followupLine = `${t.wa_followup_label} ${formattedFollowup}\n`;
   }
 
+  const categoryText = getCategoryLabel(data.category);
+
   return (
     `${header}\n` +
     `--------------------------\n` +
@@ -602,6 +630,7 @@ function buildWhatsappMessage(data) {
     `${t.wa_company} ${data.company || "-"}\n` +
     `${t.wa_phone} ${data.phone}\n` +
     `${t.wa_location} ${data.location}\n` +
+    `${t.wa_category_label} ${categoryText}\n` +
     followupLine +
     `${t.wa_details}\n${data.details}\n` +
     `--------------------------\n` +
@@ -643,6 +672,8 @@ function printOrderReceipt(order) {
     ? new Date(order.followupDate).toLocaleString(isAr ? "ar-SA" : "en-US")
     : (isAr ? "غير محدد" : "Not specified");
 
+  const categoryText = getCategoryLabel(order.category);
+
   const printHtml = `
     <div class="invoice-card">
       <div class="invoice-header">
@@ -681,8 +712,10 @@ function printOrderReceipt(order) {
           <td class="value-cell">${order.location}</td>
         </tr>
         <tr>
+          <td class="label-cell">🏷️ ${isAr ? "فئة الأولوية:" : "Priority Category:"}</td>
+          <td class="value-cell"><strong>${categoryText}</strong></td>
           <td class="label-cell">📅 ${isAr ? "موعد المتابعة:" : "Follow-up Schedule:"}</td>
-          <td class="value-cell" colspan="3"><strong>${followupFormatted}</strong></td>
+          <td class="value-cell"><strong>${followupFormatted}</strong></td>
         </tr>
       </table>
 
@@ -753,6 +786,8 @@ function printAllOrdersReport() {
       ? new Date(o.followupDate).toLocaleString(isAr ? "ar-SA" : "en-US")
       : "-";
 
+    const categoryText = getCategoryLabel(o.category);
+
     const interestedBadge = `<span class="report-badge ${o.optInterested ? 'yes' : 'no'}">🔥 ${o.optInterested ? (isAr ? "نعم" : "Yes") : (isAr ? "لا" : "No")}</span>`;
     const morningBadge = `<span class="report-badge ${o.optManagerMorning ? 'yes' : 'no'}">☀️ ${o.optManagerMorning ? (isAr ? "نعم" : "Yes") : (isAr ? "لا" : "No")}</span>`;
     const managerBadge = `<span class="report-badge ${o.optSendToManager ? 'yes' : 'no'}">📩 ${o.optSendToManager ? (isAr ? "نعم" : "Yes") : (isAr ? "لا" : "No")}</span>`;
@@ -764,6 +799,7 @@ function printAllOrdersReport() {
         <td>${o.company || "-"}</td>
         <td>${o.phone}</td>
         <td>${o.location}</td>
+        <td><strong>${categoryText}</strong></td>
         <td>${followupFormatted}</td>
         <td>${interestedBadge} ${morningBadge} ${managerBadge}</td>
         <td>${o.details}</td>
@@ -814,6 +850,7 @@ function printAllOrdersReport() {
             <th>${isAr ? "اسم الشركة" : "Company"}</th>
             <th>${isAr ? "الجوال" : "Phone"}</th>
             <th>${isAr ? "الموقع" : "Location"}</th>
+            <th>${isAr ? "الفئة" : "Category"}</th>
             <th>${isAr ? "المتابعة" : "Follow-up"}</th>
             <th>${isAr ? "التصنيفات" : "Tags"}</th>
             <th>${isAr ? "تفاصيل الطلب" : "Details"}</th>
@@ -885,7 +922,9 @@ function renderOrders() {
     );
   }
 
-  if (activeFilter === "interested") {
+  if (activeFilter === "vip") {
+    orders = orders.filter(o => o.category === "vip");
+  } else if (activeFilter === "interested") {
     orders = orders.filter(o => o.optInterested);
   } else if (activeFilter === "morning") {
     orders = orders.filter(o => o.optManagerMorning);
@@ -906,6 +945,14 @@ function renderOrders() {
     clone.querySelector(".order-item-date").textContent = order.createdAt;
     clone.querySelector(".order-item-phone").textContent = order.phone;
     clone.querySelector(".order-item-location").textContent = order.location;
+
+    // شارة فئة الأولوية
+    const catBadge = clone.querySelector(".category-badge");
+    const catKey = order.category || "new";
+    if (catBadge) {
+      catBadge.className = `category-badge ${catKey}`;
+      catBadge.textContent = getCategoryLabel(catKey);
+    }
 
     const followupRow = clone.querySelector(".order-item-followup-row");
     if (order.followupDate && followupRow) {
@@ -986,13 +1033,14 @@ if (exportCsvBtn) {
     if (orders.length === 0) return;
 
     let csvContent = "\uFEFF";
-    csvContent += "اسم العميل,اسم الشركة,رقم الجوال,الموقع,تاريخ المتابعة,تفاصيل الطلب,مهتم بالفكرة,المدير صباحاً,إرسال للمدير,تاريخ الإنشاء\n";
+    csvContent += "اسم العميل,اسم الشركة,رقم الجوال,الموقع,فئة الأولوية,تاريخ المتابعة,تفاصيل الطلب,مهتم بالفكرة,المدير صباحاً,إرسال للمدير,تاريخ الإنشاء\n";
 
     orders.forEach(o => {
       const name = `"${(o.name || "").replace(/"/g, '""')}"`;
       const company = `"${(o.company || "").replace(/"/g, '""')}"`;
       const phone = `"${(o.phone || "").replace(/"/g, '""')}"`;
       const location = `"${(o.location || "").replace(/"/g, '""')}"`;
+      const category = `"${getCategoryLabel(o.category)}"`;
       const followup = `"${(o.followupDate || "").replace(/"/g, '""')}"`;
       const details = `"${(o.details || "").replace(/"/g, '""')}"`;
       const interested = o.optInterested ? "نعم" : "لا";
@@ -1000,7 +1048,7 @@ if (exportCsvBtn) {
       const sendManager = o.optSendToManager ? "نعم" : "لا";
       const date = `"${o.createdAt || ""}"`;
 
-      csvContent += `${name},${company},${phone},${location},${followup},${details},${interested},${morning},${sendManager},${date}\n`;
+      csvContent += `${name},${company},${phone},${location},${category},${followup},${details},${interested},${morning},${sendManager},${date}\n`;
     });
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });

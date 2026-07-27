@@ -163,10 +163,10 @@
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon icon-followup">📅</div>
+          <div class="stat-icon icon-vip">⭐</div>
           <div class="stat-info">
-            <span class="stat-value" id="stat-followup">0</span>
-            <span class="stat-label" data-i18n="stat_followup">تذكير ومتابعة</span>
+            <span class="stat-value" id="stat-vip">0</span>
+            <span class="stat-label" data-i18n="stat_vip">طلبات VIP عاجلة</span>
           </div>
         </div>
       </section>
@@ -207,19 +207,29 @@
 
             <div class="form-row">
               <label class="field">
-                <span class="field-label" data-i18n="label_followup_date">موعد وتاريخ المتابعة</span>
-                <input type="datetime-local" id="followup-date">
+                <span class="field-label" data-i18n="label_order_category">فئة وتصنيف الأولوية</span>
+                <select id="order-category">
+                  <option value="vip" data-i18n="category_vip">🔴 VIP / عاجل جداً</option>
+                  <option value="new" data-i18n="category_new" selected>🟢 عميل جديد</option>
+                  <option value="service" data-i18n="category_service">🔵 تركيب وصيانة</option>
+                  <option value="inquiry" data-i18n="category_inquiry">🟡 استفسار ومتابعة</option>
+                </select>
               </label>
 
               <label class="field">
-                <span class="field-label" data-i18n="label_wa_template">قالب رسالة الواتساب</span>
-                <select id="wa-template">
-                  <option value="full" data-i18n="template_full">📌 طلب جديد شامل</option>
-                  <option value="manager" data-i18n="template_manager">☀️ موعد المدير الصباحي</option>
-                  <option value="followup" data-i18n="template_followup">🔄 رسالة متابعة للعميل</option>
-                </select>
+                <span class="field-label" data-i18n="label_followup_date">موعد وتاريخ المتابعة</span>
+                <input type="datetime-local" id="followup-date">
               </label>
             </div>
+
+            <label class="field">
+              <span class="field-label" data-i18n="label_wa_template">قالب رسالة الواتساب</span>
+              <select id="wa-template">
+                <option value="full" data-i18n="template_full">📌 طلب جديد شامل</option>
+                <option value="manager" data-i18n="template_manager">☀️ موعد المدير الصباحي</option>
+                <option value="followup" data-i18n="template_followup">🔄 رسالة متابعة للعميل</option>
+              </select>
+            </label>
 
             <label class="field">
               <span class="field-label" data-i18n="label_order_details">تفاصيل الطلب</span>
@@ -299,6 +309,7 @@
             
             <div class="filter-chips">
               <button class="chip active" data-filter="all" data-i18n="filter_all">الكل</button>
+              <button class="chip" data-filter="vip" data-i18n="filter_vip">🔴 VIP</button>
               <button class="chip" data-filter="interested" data-i18n="filter_interested">🔥 مهتم</button>
               <button class="chip" data-filter="morning" data-i18n="filter_morning">☀️ صباحاً</button>
               <button class="chip" data-filter="manager" data-i18n="filter_manager">📩 للمدير</button>
@@ -332,7 +343,10 @@
           <span class="order-item-name"></span>
           <span class="order-item-company"></span>
         </div>
-        <span class="order-item-date"></span>
+        <div class="order-item-header-right">
+          <span class="category-badge"></span>
+          <span class="order-item-date"></span>
+        </div>
       </div>
       <p class="order-item-row"><strong class="lbl-phone">الجوال:</strong> <span class="order-item-phone"></span></p>
       <p class="order-item-row"><strong class="lbl-location">الموقع:</strong> <span class="order-item-location"></span></p>
