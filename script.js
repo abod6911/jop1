@@ -241,65 +241,32 @@ let activeFilter = "all";
 let searchQuery = "";
 
 /* =========================================================
-   دوال جوجل شيت والربط التلقائي (Google Sheet Integration)
+   دالة المزامنة مع شيتات جوجل (Google Sheets Sync Function)
    ========================================================= */
+function sendOrderToGoogleSheets() {
+  // Determine Order Status based on checkboxes
+  let status = "interested"; // Default fallback
+  if (document.getElementById("sendDetailsCheck")?.checked || document.getElementById("opt-send-to-manager")?.checked) {
+    status = "send details";
+  } else if (document.getElementById("managerMorningCheck")?.checked || document.getElementById("opt-manager-morning")?.checked) {
+    status = "unavailable";
+  } else if (document.getElementById("customerInterestedCheck")?.checked || document.getElementById("opt-interested")?.checked) {
+    status = "interested";
+  }
 
-// Helper function to safely read element values from HTML
-function getVal(id) {
-  const el = document.getElementById(id);
-  return el ? el.value : "";
-}
-
-function getCheckVal(id) {
-  const el = document.getElementById(id);
-  return el && el.checked ? "Yes" : "No";
-}
-
-// Map website choices directly to Col C Order Status
-function calculateOrderStatus() {
-  const isSendDetails = document.getElementById("sendDetailsOption")?.checked || document.getElementById("opt-send-to-manager")?.checked;
-  const isManagerMorning = document.getElementById("managerMorningOption")?.checked || document.getElementById("opt-manager-morning")?.checked;
-  const isCustomerInterested = document.getElementById("customerInterestedOption")?.checked || document.getElementById("opt-interested")?.checked;
-
-  if (isSendDetails) return "send details";
-  if (isManagerMorning) return "unavailable";
-  if (isCustomerInterested) return "interested";
-  
-  return "interested"; // Default fallback status
-}
-
-// Master Function triggered on Form Submit
-function sendToGoogleSheet() {
   const payload = {
-    // Client Info (Cols D, E, F, G)
-    companyName: getVal("companyNameInput") || getVal("customer-company"),
-    customerName: getVal("customerNameInput") || getVal("customer-name"),
-    phone: getVal("phoneInput") || getVal("customer-phone"),
-    location: getVal("locationInput") || getVal("customer-location"),
-    
-    // Status Logic (Col C)
-    orderStatus: calculateOrderStatus(),
-    
-    // Products & Pricing (Cols H, I, J, K, L)
-    websiteOrder: getCheckVal("websiteOrderCheckbox"),
-    websitePrice: Number(getVal("websitePriceInput")) || 0,
-    googleReviewOrder: getCheckVal("googleReviewCheckbox"),
-    googleReviewQty: Number(getVal("googleReviewQtyInput")) || 0,
-    googleReviewPrice: Number(getVal("googleReviewPriceInput")) || 0,
-    
-    // Customization & Setup (Cols N, Q, R, S)
-    nfcUrl: getVal("nfcUrlInput"),
-    orderDetails: getVal("orderDetailsInput") || getVal("order-details"),
-    followUpDate: getVal("followUpInput") || getVal("followup-date"),
-    generalNotes: getVal("generalNotesInput"),
-    
-    // Defaults (Cols O, P)
-    assignedTo: getVal("assignedToInput") || getVal("order-category"),
+    companyName: document.getElementById("companyNameInput")?.value || document.getElementById("customer-company")?.value || "",
+    customerName: document.getElementById("clientNameInput")?.value || document.getElementById("customer-name")?.value || "",
+    phone: document.getElementById("phoneInput")?.value || document.getElementById("customer-phone")?.value || "",
+    location: document.getElementById("locationInput")?.value || document.getElementById("customer-location")?.value || "",
+    orderDetails: document.getElementById("orderDetailsInput")?.value || document.getElementById("order-details")?.value || "",
+    followUpDate: document.getElementById("followUpDateInput")?.value || document.getElementById("followup-date")?.value || "",
+    orderStatus: status,
     paymentStatus: "unpaid"
   };
 
   if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL === "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
-    console.log("Google Sheet payload ready:", payload);
+    console.log("Order payload ready for Google Sheets:", payload);
     return;
   }
 
@@ -309,8 +276,8 @@ function sendToGoogleSheet() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   })
-  .then(() => showToast("تم ربط وإرسال الطلب إلى Google Sheet بنجاح!"))
-  .catch((err) => console.error("Sync error:", err));
+  .then(() => console.log("Order synced to Google Sheets successfully!"))
+  .catch((err) => console.error("Error syncing order:", err));
 }
 
 /* =========================================================
@@ -603,17 +570,17 @@ function showLoginPage() {
    ========================================================= */
 function readOrderFormData() {
   return {
-    name: getVal("customerNameInput") || getVal("customer-name"),
-    company: getVal("companyNameInput") || getVal("customer-company"),
-    phone: getVal("phoneInput") || getVal("customer-phone"),
-    location: getVal("locationInput") || getVal("customer-location"),
-    category: getVal("assignedToInput") || getVal("order-category"),
-    followupDate: getVal("followUpInput") || getVal("followup-date"),
-    waTemplate: getVal("wa-template"),
-    details: getVal("orderDetailsInput") || getVal("order-details"),
-    optInterested: document.getElementById("customerInterestedOption")?.checked || document.getElementById("opt-interested")?.checked,
-    optManagerMorning: document.getElementById("managerMorningOption")?.checked || document.getElementById("opt-manager-morning")?.checked,
-    optSendToManager: document.getElementById("sendDetailsOption")?.checked || document.getElementById("opt-send-to-manager")?.checked
+    name: (document.getElementById("clientNameInput")?.value || document.getElementById("customer-name")?.value || "").trim(),
+    company: (document.getElementById("companyNameInput")?.value || document.getElementById("customer-company")?.value || "").trim(),
+    phone: (document.getElementById("phoneInput")?.value || document.getElementById("customer-phone")?.value || "").trim(),
+    location: (document.getElementById("locationInput")?.value || document.getElementById("customer-location")?.value || "").trim(),
+    category: document.getElementById("order-category")?.value || "new",
+    followupDate: document.getElementById("followUpDateInput")?.value || document.getElementById("followup-date")?.value || "",
+    waTemplate: document.getElementById("wa-template")?.value || "full",
+    details: (document.getElementById("orderDetailsInput")?.value || document.getElementById("order-details")?.value || "").trim(),
+    optInterested: Boolean(document.getElementById("customerInterestedCheck")?.checked || document.getElementById("opt-interested")?.checked),
+    optManagerMorning: Boolean(document.getElementById("managerMorningCheck")?.checked || document.getElementById("opt-manager-morning")?.checked),
+    optSendToManager: Boolean(document.getElementById("sendDetailsCheck")?.checked || document.getElementById("opt-send-to-manager")?.checked)
   };
 }
 
@@ -658,8 +625,8 @@ orderForm.addEventListener("submit", function (e) {
   orders.unshift(newOrder);
   saveOrders(orders);
 
-  // إرسال البيانات فوراً إلى Google Sheet
-  sendToGoogleSheet();
+  // استدعاء دالة المزامنة مع Google Sheets بالاسم الجديد
+  sendOrderToGoogleSheets();
 
   renderOrders();
   orderForm.reset();
