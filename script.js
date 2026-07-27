@@ -5,7 +5,8 @@
 const WHATSAPP_NUMBER = "966572563602";
 
 // رابط تطبيق جوجل سكريبت لربط البيانات مباشرة بشيتات جوجل (Google Sheet Sync URL)
-const GOOGLE_SHEET_WEB_APP_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const webAppUrl = "https://script.google.com/macros/s/AKfycbyGKKCoyppmGfmDxk0EQe-Ftn77mtZUSvLAkcrQ-x4kfXehM1SvS31GaoqHj__9xlSdKw/exec";
+const GOOGLE_SHEET_WEB_APP_URL = webAppUrl;
 
 const STORAGE_KEYS = {
   USERS: "muhab_users",
@@ -265,18 +266,16 @@ function sendOrderToGoogleSheets() {
     paymentStatus: "unpaid"
   };
 
-  if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL === "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
-    console.log("Order payload ready for Google Sheets:", payload);
-    return;
-  }
-
-  fetch(GOOGLE_SHEET_WEB_APP_URL, {
+  fetch(webAppUrl, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   })
-  .then(() => console.log("Order synced to Google Sheets successfully!"))
+  .then(() => {
+    console.log("Order synced to Google Sheets successfully!");
+    showToast("تم إرسال الطلب ومزامنته مع Google Sheet بنجاح! 🟢");
+  })
   .catch((err) => console.error("Error syncing order:", err));
 }
 
@@ -625,7 +624,7 @@ orderForm.addEventListener("submit", function (e) {
   orders.unshift(newOrder);
   saveOrders(orders);
 
-  // استدعاء دالة المزامنة مع Google Sheets بالاسم الجديد
+  // استدعاء دالة المزامنة المباشرة مع Google Sheets
   sendOrderToGoogleSheets();
 
   renderOrders();
