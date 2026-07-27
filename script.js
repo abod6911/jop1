@@ -270,13 +270,13 @@ function updateWelcomeBanner(username) {
   const now = new Date();
   const hour = now.getHours();
 
-  let timeGreeting = isAr ? "أهلاً بك مجدداً" : "Welcome Back";
+  let timeGreeting = isAr ? "مرحباً بك مجدداً | لوحة التحكم التنفيذية" : "Welcome Back | Executive Dashboard";
   if (hour >= 5 && hour < 12) {
-    timeGreeting = isAr ? "صباح الخير والنشاط ☀️" : "Good Morning ☀️";
+    timeGreeting = isAr ? "☀️ صباح الخير والنشاط | لوحة التحكم التنفيذية" : "☀️ Good Morning | Executive Dashboard";
   } else if (hour >= 12 && hour < 17) {
-    timeGreeting = isAr ? "مساء الخير والبركة 🌤️" : "Good Afternoon 🌤️";
+    timeGreeting = isAr ? "🌤️ مساء الخير والبركة | لوحة التحكم التنفيذية" : "🌤️ Good Afternoon | Executive Dashboard";
   } else {
-    timeGreeting = isAr ? "مساء الخير والتميّز 🌙" : "Good Evening 🌙";
+    timeGreeting = isAr ? "🌙 مساء الخير والتميّز | لوحة التحكم التنفيذية" : "🌙 Good Evening | Executive Dashboard";
   }
 
   const greetingLabelEl = document.getElementById("welcome-greeting-label");
@@ -287,8 +287,8 @@ function updateWelcomeBanner(username) {
   if (displayUsernameEl) displayUsernameEl.textContent = username || (isAr ? "عابد" : "User");
   if (welcomeSubtextEl) {
     welcomeSubtextEl.textContent = isAr 
-      ? "نتمنى لك يوماً حافلاً بالإنجازات والطلبيات الناجحة في منصة مهاب."
-      : "Wishing you a productive and successful day on the Muhab Platform.";
+      ? "أهلاً بك في منصة مهاب – نتمنى لك يوماً حافلاً بالتوفيق والطلبات المُنجزة بكل سهولة ودقة."
+      : "Welcome to Muhab Platform – Wishing you a productive day managing your orders smoothly.";
   }
 }
 

@@ -322,7 +322,7 @@ input, textarea, select{ font-family: inherit; }
   background: linear-gradient(135deg, #0E3D3B, #14554F 65%, #1E6F66);
   color: #FFFFFF;
   border-radius: var(--radius-lg);
-  padding: 24px 32px;
+  padding: 26px 34px;
   margin-bottom: 24px;
   position: relative;
   overflow: hidden;
@@ -341,7 +341,7 @@ input, textarea, select{ font-family: inherit; }
 .welcome-banner-content {
   position: relative;
   z-index: 2;
-  max-width: 650px;
+  max-width: 680px;
 }
 
 .welcome-badge {
@@ -361,7 +361,7 @@ input, textarea, select{ font-family: inherit; }
 
 .welcome-heading {
   font-family: var(--font-display);
-  font-size: 1.85rem;
+  font-size: 1.9rem;
   font-weight: 900;
   margin: 0 0 6px 0;
   color: #FFFFFF;
@@ -374,46 +374,34 @@ input, textarea, select{ font-family: inherit; }
 }
 
 .welcome-subtext {
-  font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.94rem;
+  color: rgba(255, 255, 255, 0.92);
   margin: 0;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .welcome-banner-decor {
   position: absolute;
-  inset-inline-end: 28px;
+  inset-inline-end: 32px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: center;
   pointer-events: none;
 }
 
-.gold-sparkle {
-  font-size: 2.5rem;
+.welcome-crown-glow {
+  font-size: 3.8rem;
   color: #E7C877;
-  opacity: 0.45;
-  animation: floatSparkle 3s ease-in-out infinite alternate;
+  opacity: 0.4;
+  filter: drop-shadow(0 0 12px rgba(231, 200, 119, 0.5));
+  animation: floatCrown 3s ease-in-out infinite alternate;
 }
 
-.seal-watermark-mini {
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  border: 2px dashed rgba(231, 200, 119, 0.35);
-  color: rgba(231, 200, 119, 0.35);
-  font-family: var(--font-display);
-  font-size: 2.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@keyframes floatSparkle {
-  from { transform: translateY(0) rotate(0deg); opacity: 0.3; }
-  to { transform: translateY(-6px) rotate(12deg); opacity: 0.65; }
+@keyframes floatCrown {
+  from { transform: translateY(0) scale(1); opacity: 0.35; }
+  to { transform: translateY(-8px) scale(1.08); opacity: 0.65; }
 }
 
 /* =========================================================
