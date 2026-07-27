@@ -4,6 +4,9 @@
 
 const WHATSAPP_NUMBER = "966572563602";
 
+// رابط تطبيق جوجل سكريبت لربط البيانات مباشرة بشيتات جوجل (Google Sheet Sync URL)
+const GOOGLE_SHEET_WEB_APP_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
 const STORAGE_KEYS = {
   USERS: "muhab_users",
   SESSION: "muhab_session",
@@ -236,6 +239,79 @@ let currentLang = localStorage.getItem(STORAGE_KEYS.LANG) || "ar";
 let currentTheme = localStorage.getItem(STORAGE_KEYS.THEME) || "light";
 let activeFilter = "all";
 let searchQuery = "";
+
+/* =========================================================
+   دوال جوجل شيت والربط التلقائي (Google Sheet Integration)
+   ========================================================= */
+
+// Helper function to safely read element values from HTML
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : "";
+}
+
+function getCheckVal(id) {
+  const el = document.getElementById(id);
+  return el && el.checked ? "Yes" : "No";
+}
+
+// Map website choices directly to Col C Order Status
+function calculateOrderStatus() {
+  const isSendDetails = document.getElementById("sendDetailsOption")?.checked || document.getElementById("opt-send-to-manager")?.checked;
+  const isManagerMorning = document.getElementById("managerMorningOption")?.checked || document.getElementById("opt-manager-morning")?.checked;
+  const isCustomerInterested = document.getElementById("customerInterestedOption")?.checked || document.getElementById("opt-interested")?.checked;
+
+  if (isSendDetails) return "send details";
+  if (isManagerMorning) return "unavailable";
+  if (isCustomerInterested) return "interested";
+  
+  return "interested"; // Default fallback status
+}
+
+// Master Function triggered on Form Submit
+function sendToGoogleSheet() {
+  const payload = {
+    // Client Info (Cols D, E, F, G)
+    companyName: getVal("companyNameInput") || getVal("customer-company"),
+    customerName: getVal("customerNameInput") || getVal("customer-name"),
+    phone: getVal("phoneInput") || getVal("customer-phone"),
+    location: getVal("locationInput") || getVal("customer-location"),
+    
+    // Status Logic (Col C)
+    orderStatus: calculateOrderStatus(),
+    
+    // Products & Pricing (Cols H, I, J, K, L)
+    websiteOrder: getCheckVal("websiteOrderCheckbox"),
+    websitePrice: Number(getVal("websitePriceInput")) || 0,
+    googleReviewOrder: getCheckVal("googleReviewCheckbox"),
+    googleReviewQty: Number(getVal("googleReviewQtyInput")) || 0,
+    googleReviewPrice: Number(getVal("googleReviewPriceInput")) || 0,
+    
+    // Customization & Setup (Cols N, Q, R, S)
+    nfcUrl: getVal("nfcUrlInput"),
+    orderDetails: getVal("orderDetailsInput") || getVal("order-details"),
+    followUpDate: getVal("followUpInput") || getVal("followup-date"),
+    generalNotes: getVal("generalNotesInput"),
+    
+    // Defaults (Cols O, P)
+    assignedTo: getVal("assignedToInput") || getVal("order-category"),
+    paymentStatus: "unpaid"
+  };
+
+  if (!GOOGLE_SHEET_WEB_APP_URL || GOOGLE_SHEET_WEB_APP_URL === "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE") {
+    console.log("Google Sheet payload ready:", payload);
+    return;
+  }
+
+  fetch(GOOGLE_SHEET_WEB_APP_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(() => showToast("تم ربط وإرسال الطلب إلى Google Sheet بنجاح!"))
+  .catch((err) => console.error("Sync error:", err));
+}
 
 /* =========================================================
    إدارة الوضع الليلي/النهاري (Dark Mode / Light Mode)
@@ -523,21 +599,21 @@ function showLoginPage() {
 }
 
 /* =========================================================
-   قراءة بيانات نموذج الطلب (شاملاً فئة الأولوية)
+   قراءة بيانات نموذج الطلب
    ========================================================= */
 function readOrderFormData() {
   return {
-    name: document.getElementById("customer-name").value.trim(),
-    company: document.getElementById("customer-company").value.trim(),
-    phone: document.getElementById("customer-phone").value.trim(),
-    location: document.getElementById("customer-location").value.trim(),
-    category: document.getElementById("order-category").value,
-    followupDate: document.getElementById("followup-date").value,
-    waTemplate: document.getElementById("wa-template").value,
-    details: document.getElementById("order-details").value.trim(),
-    optInterested: document.getElementById("opt-interested").checked,
-    optManagerMorning: document.getElementById("opt-manager-morning").checked,
-    optSendToManager: document.getElementById("opt-send-to-manager").checked
+    name: getVal("customerNameInput") || getVal("customer-name"),
+    company: getVal("companyNameInput") || getVal("customer-company"),
+    phone: getVal("phoneInput") || getVal("customer-phone"),
+    location: getVal("locationInput") || getVal("customer-location"),
+    category: getVal("assignedToInput") || getVal("order-category"),
+    followupDate: getVal("followUpInput") || getVal("followup-date"),
+    waTemplate: getVal("wa-template"),
+    details: getVal("orderDetailsInput") || getVal("order-details"),
+    optInterested: document.getElementById("customerInterestedOption")?.checked || document.getElementById("opt-interested")?.checked,
+    optManagerMorning: document.getElementById("managerMorningOption")?.checked || document.getElementById("opt-manager-morning")?.checked,
+    optSendToManager: document.getElementById("sendDetailsOption")?.checked || document.getElementById("opt-send-to-manager")?.checked
   };
 }
 
@@ -549,7 +625,7 @@ function validateOrderData(data) {
 }
 
 /* =========================================================
-   حفظ الطلب (Order Form Submit)
+   حفظ الطلب وإرساله إلى Google Sheet تلقائياً
    ========================================================= */
 orderForm.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -581,6 +657,9 @@ orderForm.addEventListener("submit", function (e) {
   const orders = getOrders();
   orders.unshift(newOrder);
   saveOrders(orders);
+
+  // إرسال البيانات فوراً إلى Google Sheet
+  sendToGoogleSheet();
 
   renderOrders();
   orderForm.reset();
