@@ -504,7 +504,7 @@ function showLoginPage() {
 }
 
 /* =========================================================
-   قراءة بيانات نموذج الطلب وقوالب الرسائل
+   قراءة بيانات نموذج الطلب
    ========================================================= */
 function readOrderFormData() {
   return {
@@ -566,7 +566,7 @@ orderForm.addEventListener("submit", function (e) {
 });
 
 /* =========================================================
-   تنسيق رسالة واتساب حسب القالب المختار
+   تنسيق رسالة واتساب
    ========================================================= */
 function buildWhatsappMessage(data) {
   const t = TRANSLATIONS[currentLang];
@@ -631,58 +631,90 @@ sendWhatsappBtn.addEventListener("click", function () {
 });
 
 /* =========================================================
-   طباعة فاتورة وسند طلب رسمي محترف (@media print)
+   طباعة وتصدير الفاتورة الرسمية الفخمة بالهوية المعتمدة
    ========================================================= */
 function printOrderReceipt(order) {
   const t = TRANSLATIONS[currentLang];
-  const yesStr = t.yes;
-  const noStr = t.no;
+  const isAr = currentLang === "ar";
 
   const followupFormatted = order.followupDate
-    ? new Date(order.followupDate).toLocaleString(currentLang === "ar" ? "ar-SA" : "en-US")
-    : (currentLang === "ar" ? "غير محدد" : "Not specified");
+    ? new Date(order.followupDate).toLocaleString(isAr ? "ar-SA" : "en-US")
+    : (isAr ? "غير محدد" : "Not specified");
 
   const printHtml = `
     <div class="invoice-card">
       <div class="invoice-header">
-        <div class="invoice-logo">
-          <div class="invoice-logo-seal">م</div>
-          <div class="invoice-title-block">
-            <h1>${t.brand_name}</h1>
-            <p>${currentLang === "ar" ? "سند تسجيل وإدارة طلبات العملاء" : "Customer Order Registration Receipt"}</p>
+        <div class="invoice-brand-block">
+          <div class="invoice-seal"><span>م</span></div>
+          <div class="invoice-title-text">
+            <h1>${isAr ? "مؤسسة مهاب لإدارة الخدمات والطلبات" : "Muhab Enterprise for Order Services"}</h1>
+            <p>${isAr ? "نظام إلكتروني موثّق لإدارة وتوثيق طلبات العملاء والشركات" : "Certified E-System for Customer & Enterprise Order Management"}</p>
           </div>
         </div>
-        <div class="invoice-meta">
-          <div><strong>${currentLang === "ar" ? "رقم الطلب:" : "Order ID:"}</strong> #${order.id.slice(-6)}</div>
-          <div><strong>${currentLang === "ar" ? "التاريخ:" : "Date:"}</strong> ${order.createdAt}</div>
+        <div class="invoice-doc-meta">
+          <div class="invoice-doc-type">${isAr ? "سند تسجيل طلب رسمـي" : "Official Order Registration Receipt"}</div>
+          <div class="invoice-meta-row">${isAr ? "رقم السند:" : "Receipt No:"} <strong>MHB-${order.id.slice(-6)}</strong></div>
+          <div class="invoice-meta-row">${isAr ? "تاريخ الإصدار:" : "Issue Date:"} ${order.createdAt}</div>
         </div>
       </div>
 
-      <div class="invoice-grid">
-        <div class="invoice-field"><strong>${t.label_customer_name}:</strong> ${order.name}</div>
-        <div class="invoice-field"><strong>${t.label_company_name}:</strong> ${order.company || "-"}</div>
-        <div class="invoice-field"><strong>${t.label_customer_phone}:</strong> ${order.phone}</div>
-        <div class="invoice-field"><strong>${t.label_location}:</strong> ${order.location}</div>
-        <div class="invoice-field"><strong>${t.label_followup_date}:</strong> ${followupFormatted}</div>
+      <table class="invoice-grid-table">
+        <tr>
+          <td class="label-cell">${isAr ? "اسم العميل:" : "Customer Name:"}</td>
+          <td class="value-cell"><strong>${order.name}</strong></td>
+          <td class="label-cell">${isAr ? "اسم الشركة:" : "Company Name:"}</td>
+          <td class="value-cell"><strong>${order.company || "-"}</strong></td>
+        </tr>
+        <tr>
+          <td class="label-cell">${isAr ? "رقم الجوال:" : "Phone Number:"}</td>
+          <td class="value-cell">${order.phone}</td>
+          <td class="label-cell">${isAr ? "الموقع / العنوان:" : "Location/Address:"}</td>
+          <td class="value-cell">${order.location}</td>
+        </tr>
+        <tr>
+          <td class="label-cell">${isAr ? "تاريخ وموعد المتابعة:" : "Follow-up Schedule:"}</td>
+          <td class="value-cell" colspan="3"><strong>${followupFormatted}</strong></td>
+        </tr>
+      </table>
+
+      <div class="invoice-section-heading">${isAr ? "تصنيف ومعلومات نوعية العميل" : "Customer Classification Summary"}</div>
+      <div class="invoice-classification-grid">
+        <div class="invoice-class-card">
+          <div class="invoice-class-title">${isAr ? "اهتمام العميل بالفكرة" : "Customer Interest"}</div>
+          <div class="invoice-class-val ${order.optInterested ? 'yes' : 'no'}">
+            ${order.optInterested ? (isAr ? "✓ متحمس ومستعد" : "✓ Interested") : (isAr ? "✗ غير محدد" : "✗ Not specified")}
+          </div>
+        </div>
+        <div class="invoice-class-card">
+          <div class="invoice-class-title">${isAr ? "تواجد المدير الصباحي" : "Morning Manager Presence"}</div>
+          <div class="invoice-class-val ${order.optManagerMorning ? 'yes' : 'no'}">
+            ${order.optManagerMorning ? (isAr ? "✓ متواجد صباحاً" : "✓ Available Morning") : (isAr ? "✗ غير متاح" : "✗ Unavailable")}
+          </div>
+        </div>
+        <div class="invoice-class-card">
+          <div class="invoice-class-title">${isAr ? "إرسال التفاصيل للمدير" : "Forward to Manager"}</div>
+          <div class="invoice-class-val ${order.optSendToManager ? 'yes' : 'no'}">
+            ${order.optSendToManager ? (isAr ? "✓ مطلوب الرفع للمدير" : "✓ Send to Manager") : (isAr ? "✗ لا يتطلب" : "✗ Not required")}
+          </div>
+        </div>
       </div>
 
-      <div class="invoice-section-title">${t.classification_title}</div>
-      <div class="invoice-tags">
-        <span class="invoice-tag-item">${t.opt_interested}: <strong>${order.optInterested ? yesStr : noStr}</strong></span>
-        <span class="invoice-tag-item">${t.opt_manager_morning}: <strong>${order.optManagerMorning ? yesStr : noStr}</strong></span>
-        <span class="invoice-tag-item">${t.opt_send_to_manager}: <strong>${order.optSendToManager ? yesStr : noStr}</strong></span>
-      </div>
+      <div class="invoice-section-heading">${isAr ? "تفاصيل ومواصفات الطلب" : "Order Specifications & Details"}</div>
+      <div class="invoice-details-card">${order.details}</div>
 
-      <div class="invoice-section-title">${t.label_order_details}</div>
-      <div class="invoice-details-box">${order.details}</div>
-
-      <div class="invoice-footer">
+      <div class="invoice-footer-block">
         <div class="invoice-sign-box">
-          <div>${currentLang === "ar" ? "توقيع ملمّس الطلب / المسؤول" : "Authorized Agent Signature"}</div>
+          <div>${isAr ? "توقيع الموظف / المسؤول المختص" : "Agent Authorized Signature"}</div>
           <div class="invoice-sign-line"></div>
         </div>
+
+        <div class="invoice-watermark-stamp">
+          <div>مؤسسة مهاب</div>
+          <div>معتمد رسمياً</div>
+        </div>
+
         <div class="invoice-sign-box">
-          <div>${currentLang === "ar" ? "ختم المؤسسة" : "Company Stamp"}</div>
+          <div>${isAr ? "اعتماد قسم الإدارة والختم" : "Management Seal & Approval"}</div>
           <div class="invoice-sign-line"></div>
         </div>
       </div>

@@ -129,7 +129,6 @@ input, textarea, select{ font-family: inherit; }
   border: 1px solid var(--border);
 }
 
-/* --- اللوحة اليمنى: هوية الشركة --- */
 .auth-brand{
   position:relative;
   background: linear-gradient(160deg, var(--teal-deep), var(--teal-mid) 60%, var(--teal-soft));
@@ -202,7 +201,6 @@ input, textarea, select{ font-family: inherit; }
   top:5px;
 }
 
-/* خط منقط أسفل اللوحة */
 .perforated-edge{
   position:absolute;
   bottom:0; left:0; right:0;
@@ -219,7 +217,6 @@ input, textarea, select{ font-family: inherit; }
   background-size:16px 10px;
 }
 
-/* --- اللوحة اليسرى: نموذج الدخول --- */
 .auth-form-panel{
   padding: 36px 40px;
   display:flex;
@@ -367,19 +364,10 @@ input, textarea, select{ font-family: inherit; }
   gap: 10px;
 }
 
-.switch-icon {
-  font-size: 1.1rem;
-}
+.switch-icon { font-size: 1.1rem; }
+.switch-text { font-size: 0.88rem; font-weight: 600; color: var(--ink); }
 
-.switch-text {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.switch-item input[type="checkbox"] {
-  display: none;
-}
+.switch-item input[type="checkbox"] { display: none; }
 
 .switch-slider {
   width: 42px;
@@ -482,9 +470,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   border-radius: 999px;
   transition: all 0.2s ease;
 }
-.btn-theme:hover {
-  border-color: var(--teal-soft);
-}
+.btn-theme:hover { border-color: var(--teal-soft); }
 
 .btn-lang {
   background: var(--bg);
@@ -876,131 +862,220 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 
 /* =========================================================
-   تنسيق الفاتورة الرسمية للطباعة (@media print)
+   تنسيق الفاتورة الرسمية الاحترافية للطباعة (@media print)
    ========================================================= */
 .print-area { display: none; }
 
 @media print {
-  body * { visibility: hidden; }
-  .print-area, .print-area * { visibility: visible; }
+  body * { visibility: hidden !important; }
+  .print-area, .print-area * { visibility: visible !important; }
   .print-area {
     display: block !important;
     position: absolute;
     top: 0; left: 0; width: 100%;
-    padding: 24px;
-    background: #fff !important;
-    color: #111 !important;
-    font-family: var(--font-body) !important;
+    padding: 0;
+    margin: 0;
+    background: #FFF !important;
+    color: #16302C !important;
+    font-family: "Tajawal", sans-serif !important;
   }
 
   .invoice-card {
-    border: 2px solid #0E3D3B;
-    border-radius: 12px;
-    padding: 28px;
-    max-width: 800px;
-    margin: 0 auto;
-    background: #fff;
+    border: 3px double #0E3D3B;
+    border-radius: 16px;
+    padding: 36px 40px;
+    max-width: 850px;
+    margin: 20px auto;
+    background: #FFFFFF !important;
     position: relative;
+    box-shadow: none !important;
   }
 
+  /* الترويسة العليا بالهوية الرسمية */
   .invoice-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid #C6952E;
-    padding-bottom: 16px;
-    margin-bottom: 20px;
+    border-bottom: 3px solid #C6952E;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
   }
-  .invoice-logo {
+
+  .invoice-brand-block {
     display: flex;
     align-items: center;
-    gap: 12px;
-  }
-  .invoice-logo-seal {
-    width: 50px; height: 50px;
-    border-radius: 50%;
-    background: #0E3D3B;
-    color: #E7C877;
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .invoice-title-block h1 {
-    font-size: 1.6rem; margin: 0; color: #0E3D3B;
-  }
-  .invoice-title-block p {
-    font-size: 0.85rem; margin: 2px 0 0; color: #555;
-  }
-
-  .invoice-meta {
-    text-align: end;
-    font-size: 0.85rem;
-    color: #444;
-  }
-
-  .invoice-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 16px;
-    background: #F4F7F5;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 20px;
-  }
-  .invoice-field {
-    font-size: 0.92rem;
-    margin: 4px 0;
   }
 
-  .invoice-section-title {
-    font-size: 1rem;
+  .invoice-seal {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #0E3D3B, #14554F);
+    border: 3px solid #C6952E;
+    color: #E7C877;
+    font-family: "Reem Kufi", sans-serif;
+    font-size: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(14,61,59,0.2);
+  }
+
+  .invoice-title-text h1 {
+    font-family: "Reem Kufi", sans-serif;
+    font-size: 2rem;
+    margin: 0;
+    color: #0E3D3B;
+    letter-spacing: 1px;
+  }
+  .invoice-title-text p {
+    font-size: 0.9rem;
+    margin: 3px 0 0;
+    color: #52685F;
+    font-weight: 500;
+  }
+
+  .invoice-doc-meta {
+    text-align: end;
+    background: #F4F7F5;
+    border: 1.5px solid #DDE6E1;
+    border-radius: 10px;
+    padding: 10px 16px;
+  }
+  .invoice-doc-type {
+    font-family: "Reem Kufi", sans-serif;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #0E3D3B;
-    border-bottom: 1px solid #DDE6E1;
-    padding-bottom: 6px;
-    margin: 18px 0 10px;
+    margin-bottom: 4px;
+  }
+  .invoice-meta-row {
+    font-size: 0.85rem;
+    color: #16302C;
+    margin: 2px 0;
+  }
+  .invoice-meta-row strong {
+    color: #C6952E;
   }
 
-  .invoice-details-box {
-    background: #FFF;
-    border: 1px solid #CCC;
-    border-radius: 6px;
-    padding: 14px;
-    min-height: 100px;
-    white-space: pre-wrap;
-    font-size: 0.92rem;
-    line-height: 1.7;
+  /* جدول بيانات العميل والشركة */
+  .invoice-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
   }
-
-  .invoice-tags {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
+  .invoice-grid-table td {
+    padding: 12px 16px;
+    border: 1px solid #DDE6E1;
+    font-size: 0.93rem;
   }
-  .invoice-tag-item {
-    font-size: 0.82rem;
+  .invoice-grid-table td.label-cell {
+    background: #F4F7F5;
     font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
-    border: 1px solid #AAA;
+    color: #0E3D3B;
+    width: 25%;
+  }
+  .invoice-grid-table td.value-cell {
+    background: #FFFFFF;
+    color: #16302C;
+    width: 25%;
   }
 
-  .invoice-footer {
+  /* قسم تصنيف العميل والملاحظات */
+  .invoice-section-heading {
+    font-family: "Reem Kufi", sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0E3D3B;
+    border-bottom: 2px solid #DDE6E1;
+    padding-bottom: 6px;
+    margin: 22px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .invoice-section-heading::before {
+    content: "◆";
+    color: #C6952E;
+    font-size: 0.8rem;
+  }
+
+  .invoice-classification-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .invoice-class-card {
+    border: 1px solid #DDE6E1;
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #F8FAF9;
+    text-align: center;
+  }
+  .invoice-class-title {
+    font-size: 0.78rem;
+    color: #52685F;
+    margin-bottom: 4px;
+  }
+  .invoice-class-val {
+    font-size: 0.95rem;
+    font-weight: 800;
+  }
+  .invoice-class-val.yes { color: #22A85C; }
+  .invoice-class-val.no { color: #C0392B; }
+
+  /* صندوق التفاصيل */
+  .invoice-details-card {
+    background: #FCFDFC;
+    border: 1.5px solid #DDE6E1;
+    border-radius: 10px;
+    padding: 16px 20px;
+    min-height: 110px;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #16302C;
+  }
+
+  /* تذييل الفاتورة والتواضيع */
+  .invoice-footer-block {
     margin-top: 40px;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    border-top: 1px dashed #AAA;
-    padding-top: 16px;
+    border-top: 2px solid #C6952E;
+    padding-top: 24px;
   }
+
   .invoice-sign-box {
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
+    color: #0E3D3B;
+    font-weight: 700;
   }
   .invoice-sign-line {
-    width: 160px;
-    border-bottom: 1.5px solid #000;
-    margin-top: 30px;
+    width: 170px;
+    border-bottom: 2px dashed #0E3D3B;
+    margin-top: 36px;
+  }
+
+  .invoice-watermark-stamp {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px dashed #C6952E;
+    color: #C6952E;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "Reem Kufi", sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transform: rotate(-12deg);
+    opacity: 0.85;
   }
 }
 
