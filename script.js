@@ -16,6 +16,8 @@ const STORAGE_KEYS = {
   THEME: "muhab_theme"
 };
 
+let isSyncingToGoogle = false; // لمنع التكرار والإرسال المزدوج (Single Send Lock)
+
 /* =========================================================
    قاموس الترجمات الشامل (Arabic & English Translations)
    ========================================================= */
@@ -242,28 +244,47 @@ let activeFilter = "all";
 let searchQuery = "";
 
 /* =========================================================
-   دالة المزامنة مع شيتات جوجل (Google Sheets Sync Function)
+   دالة المزامنة الشاملة والمحترفة مع شيتات جوجل (مرة واحدة فقط)
    ========================================================= */
-function sendOrderToGoogleSheets() {
-  // Determine Order Status based on checkboxes
-  let status = "interested"; // Default fallback
-  if (document.getElementById("sendDetailsCheck")?.checked || document.getElementById("opt-send-to-manager")?.checked) {
-    status = "send details";
-  } else if (document.getElementById("managerMorningCheck")?.checked || document.getElementById("opt-manager-morning")?.checked) {
-    status = "unavailable";
-  } else if (document.getElementById("customerInterestedCheck")?.checked || document.getElementById("opt-interested")?.checked) {
-    status = "interested";
-  }
+function sendOrderToGoogleSheets(orderObj) {
+  if (isSyncingToGoogle) return; // منع التكرار والإرسال المزدوج
+  isSyncingToGoogle = true;
 
+  // قراءة كافة البيانات بمرونة كاملة
+  const company = orderObj?.company || document.getElementById("companyNameInput")?.value || document.getElementById("customer-company")?.value || "";
+  const customer = orderObj?.name || document.getElementById("clientNameInput")?.value || document.getElementById("customer-name")?.value || "";
+  const phone = orderObj?.phone || document.getElementById("phoneInput")?.value || document.getElementById("customer-phone")?.value || "";
+  const location = orderObj?.location || document.getElementById("locationInput")?.value || document.getElementById("customer-location")?.value || "";
+  const details = orderObj?.details || document.getElementById("orderDetailsInput")?.value || document.getElementById("order-details")?.value || "";
+  const followup = orderObj?.followupDate || document.getElementById("followUpDateInput")?.value || document.getElementById("followup-date")?.value || "";
+  
+  const isInterested = orderObj ? orderObj.optInterested : (document.getElementById("customerInterestedCheck")?.checked || document.getElementById("opt-interested")?.checked);
+  const isMorning = orderObj ? orderObj.optManagerMorning : (document.getElementById("managerMorningCheck")?.checked || document.getElementById("opt-manager-morning")?.checked);
+  const isSendDetails = orderObj ? orderObj.optSendToManager : (document.getElementById("sendDetailsCheck")?.checked || document.getElementById("opt-send-to-manager")?.checked);
+
+  // تحديد الحالة بدقة
+  let status = "interested";
+  if (isSendDetails) status = "send details";
+  else if (isMorning) status = "unavailable";
+  else if (isInterested) status = "interested";
+
+  const categoryText = getCategoryLabel(orderObj?.category || document.getElementById("order-category")?.value || "new");
+
+  // حمولة إدارية شاملة ومنظمة لـ Google Sheet
   const payload = {
-    companyName: document.getElementById("companyNameInput")?.value || document.getElementById("customer-company")?.value || "",
-    customerName: document.getElementById("clientNameInput")?.value || document.getElementById("customer-name")?.value || "",
-    phone: document.getElementById("phoneInput")?.value || document.getElementById("customer-phone")?.value || "",
-    location: document.getElementById("locationInput")?.value || document.getElementById("customer-location")?.value || "",
-    orderDetails: document.getElementById("orderDetailsInput")?.value || document.getElementById("order-details")?.value || "",
-    followUpDate: document.getElementById("followUpDateInput")?.value || document.getElementById("followup-date")?.value || "",
+    customerName: customer,
+    companyName: company,
+    phone: phone,
+    location: location,
+    orderCategory: categoryText,
+    followUpDate: followup || "غير محدد",
+    orderDetails: details,
+    optInterested: isInterested ? "نعم" : "لا",
+    optManagerMorning: isMorning ? "نعم" : "لا",
+    optSendToManager: isSendDetails ? "نعم" : "لا",
     orderStatus: status,
-    paymentStatus: "unpaid"
+    paymentStatus: "unpaid",
+    createdAt: orderObj?.createdAt || new Date().toLocaleString("ar-SA")
   };
 
   fetch(webAppUrl, {
@@ -273,10 +294,14 @@ function sendOrderToGoogleSheets() {
     body: JSON.stringify(payload)
   })
   .then(() => {
-    console.log("Order synced to Google Sheets successfully!");
-    showToast("تم إرسال الطلب ومزامنته مع Google Sheet بنجاح! 🟢");
+    console.log("Order synced once to Google Sheets successfully!");
+    showToast("تم مزامنة وتوثيق الطلب في Google Sheet بنجاح! 🟢");
   })
-  .catch((err) => console.error("Error syncing order:", err));
+  .catch((err) => console.error("Error syncing order:", err))
+  .finally(() => {
+    // فتح القفل بعد ثانية واحدة لإتاحة الطلب القادم
+    setTimeout(() => { isSyncingToGoogle = false; }, 1200);
+  });
 }
 
 /* =========================================================
@@ -591,7 +616,7 @@ function validateOrderData(data) {
 }
 
 /* =========================================================
-   حفظ الطلب وإرساله إلى Google Sheet تلقائياً
+   حفظ الطلب وإرساله مرة واحدة فقط إلى Google Sheet
    ========================================================= */
 orderForm.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -624,8 +649,8 @@ orderForm.addEventListener("submit", function (e) {
   orders.unshift(newOrder);
   saveOrders(orders);
 
-  // استدعاء دالة المزامنة المباشرة مع Google Sheets
-  sendOrderToGoogleSheets();
+  // إرسال الطلب مرة واحدة فقط ببيانات كاملة
+  sendOrderToGoogleSheets(newOrder);
 
   renderOrders();
   orderForm.reset();
