@@ -92,7 +92,7 @@ const TRANSLATIONS = {
     lbl_company: "الشركة:",
     lbl_followup: "المتابعة:",
     lbl_copy: "نسخ",
-    lbl_print: "طباعة",
+    lbl_print: "طباعة الفاتورة",
     btn_delete: "حذف",
     btn_whatsapp_mini: "إرسال عبر واتساب",
     toast_copied: "📋 تم نسخ نص رسالة الواتساب بنجاح!",
@@ -190,7 +190,7 @@ const TRANSLATIONS = {
     lbl_company: "Company:",
     lbl_followup: "Follow-up:",
     lbl_copy: "Copy",
-    lbl_print: "Print",
+    lbl_print: "Print Receipt",
     btn_delete: "Delete",
     btn_whatsapp_mini: "Send via WhatsApp",
     toast_copied: "📋 WhatsApp message copied successfully!",
@@ -631,7 +631,7 @@ sendWhatsappBtn.addEventListener("click", function () {
 });
 
 /* =========================================================
-   طباعة وتصدير الفاتورة الرسمية الفخمة بالهوية المعتمدة
+   طباعة وتصدير الفاتورة الرسمية الفخمة بالهوية المعتمدة والـ QR
    ========================================================= */
 function printOrderReceipt(order) {
   const t = TRANSLATIONS[currentLang];
@@ -651,28 +651,35 @@ function printOrderReceipt(order) {
             <p>${isAr ? "نظام إلكتروني موثّق لإدارة وتوثيق طلبات العملاء والشركات" : "Certified E-System for Customer & Enterprise Order Management"}</p>
           </div>
         </div>
-        <div class="invoice-doc-meta">
-          <div class="invoice-doc-type">${isAr ? "سند تسجيل طلب رسمـي" : "Official Order Registration Receipt"}</div>
-          <div class="invoice-meta-row">${isAr ? "رقم السند:" : "Receipt No:"} <strong>MHB-${order.id.slice(-6)}</strong></div>
-          <div class="invoice-meta-row">${isAr ? "تاريخ الإصدار:" : "Issue Date:"} ${order.createdAt}</div>
+
+        <div class="invoice-header-right">
+          <div class="invoice-qr-code">
+            <div class="qr-pattern">▚▞▚</div>
+            <div class="qr-label">VERIFIED</div>
+          </div>
+          <div class="invoice-doc-meta">
+            <div class="invoice-doc-type">${isAr ? "سند تسجيل طلب رسمـي" : "Official Order Registration Receipt"}</div>
+            <div class="invoice-meta-row">${isAr ? "رقم السند:" : "Receipt No:"} <strong>MHB-${order.id.slice(-6)}</strong></div>
+            <div class="invoice-meta-row">${isAr ? "تاريخ الإصدار:" : "Issue Date:"} ${order.createdAt}</div>
+          </div>
         </div>
       </div>
 
       <table class="invoice-grid-table">
         <tr>
-          <td class="label-cell">${isAr ? "اسم العميل:" : "Customer Name:"}</td>
+          <td class="label-cell">👤 ${isAr ? "اسم العميل:" : "Customer Name:"}</td>
           <td class="value-cell"><strong>${order.name}</strong></td>
-          <td class="label-cell">${isAr ? "اسم الشركة:" : "Company Name:"}</td>
+          <td class="label-cell">🏢 ${isAr ? "اسم الشركة:" : "Company Name:"}</td>
           <td class="value-cell"><strong>${order.company || "-"}</strong></td>
         </tr>
         <tr>
-          <td class="label-cell">${isAr ? "رقم الجوال:" : "Phone Number:"}</td>
+          <td class="label-cell">📞 ${isAr ? "رقم الجوال:" : "Phone Number:"}</td>
           <td class="value-cell">${order.phone}</td>
-          <td class="label-cell">${isAr ? "الموقع / العنوان:" : "Location/Address:"}</td>
+          <td class="label-cell">📍 ${isAr ? "الموقع / العنوان:" : "Location/Address:"}</td>
           <td class="value-cell">${order.location}</td>
         </tr>
         <tr>
-          <td class="label-cell">${isAr ? "تاريخ وموعد المتابعة:" : "Follow-up Schedule:"}</td>
+          <td class="label-cell">📅 ${isAr ? "موعد المتابعة:" : "Follow-up Schedule:"}</td>
           <td class="value-cell" colspan="3"><strong>${followupFormatted}</strong></td>
         </tr>
       </table>
@@ -680,26 +687,26 @@ function printOrderReceipt(order) {
       <div class="invoice-section-heading">${isAr ? "تصنيف ومعلومات نوعية العميل" : "Customer Classification Summary"}</div>
       <div class="invoice-classification-grid">
         <div class="invoice-class-card">
-          <div class="invoice-class-title">${isAr ? "اهتمام العميل بالفكرة" : "Customer Interest"}</div>
+          <div class="invoice-class-title">🔥 ${isAr ? "اهتمام العميل بالفكرة" : "Customer Interest"}</div>
           <div class="invoice-class-val ${order.optInterested ? 'yes' : 'no'}">
             ${order.optInterested ? (isAr ? "✓ متحمس ومستعد" : "✓ Interested") : (isAr ? "✗ غير محدد" : "✗ Not specified")}
           </div>
         </div>
         <div class="invoice-class-card">
-          <div class="invoice-class-title">${isAr ? "تواجد المدير الصباحي" : "Morning Manager Presence"}</div>
+          <div class="invoice-class-title">☀️ ${isAr ? "تواجد المدير الصباحي" : "Morning Manager Presence"}</div>
           <div class="invoice-class-val ${order.optManagerMorning ? 'yes' : 'no'}">
             ${order.optManagerMorning ? (isAr ? "✓ متواجد صباحاً" : "✓ Available Morning") : (isAr ? "✗ غير متاح" : "✗ Unavailable")}
           </div>
         </div>
         <div class="invoice-class-card">
-          <div class="invoice-class-title">${isAr ? "إرسال التفاصيل للمدير" : "Forward to Manager"}</div>
+          <div class="invoice-class-title">📩 ${isAr ? "إرسال التفاصيل للمدير" : "Forward to Manager"}</div>
           <div class="invoice-class-val ${order.optSendToManager ? 'yes' : 'no'}">
             ${order.optSendToManager ? (isAr ? "✓ مطلوب الرفع للمدير" : "✓ Send to Manager") : (isAr ? "✗ لا يتطلب" : "✗ Not required")}
           </div>
         </div>
       </div>
 
-      <div class="invoice-section-heading">${isAr ? "تفاصيل ومواصفات الطلب" : "Order Specifications & Details"}</div>
+      <div class="invoice-section-heading">📝 ${isAr ? "تفاصيل ومواصفات الطلب" : "Order Specifications & Details"}</div>
       <div class="invoice-details-card">${order.details}</div>
 
       <div class="invoice-footer-block">
