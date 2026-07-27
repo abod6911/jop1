@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-i18n="page_title">مهاب | نظام الطلبات</title>
+  <title data-i18n="page_title">مهاب | نظام الطلبات المحترف</title>
 
-  <!-- خطوط عربية وباطينية من جوجل -->
+  <!-- خطوط من جوجل -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 
@@ -13,7 +13,7 @@
 </head>
 <body>
 
-  <!-- ===================== شاشة الخلفية العلامة التجارية (تظهر خلف كل الصفحات) ===================== -->
+  <!-- ===================== شاشة الخلفية العلامة التجارية ===================== -->
   <div class="brand-watermark" aria-hidden="true">
     <span class="stamp-ring">
       <span class="stamp-text" data-i18n="brand_name">مهاب</span>
@@ -32,8 +32,8 @@
         <h1 class="brand-name" data-i18n="brand_name">مهاب</h1>
         <p class="brand-tagline" data-i18n="brand_tagline">نظام تسجيل الطلبات وإرسالها مباشرة عبر واتساب</p>
         <ul class="brand-points">
-          <li data-i18n="brand_point_1">تسجيل بيانات العملاء بسهولة</li>
-          <li data-i18n="brand_point_2">حفظ الطلبات تلقائياً على جهازك</li>
+          <li data-i18n="brand_point_1">تسجيل بيانات العملاء والشركات بسهولة</li>
+          <li data-i18n="brand_point_2">حفظ الطلبات وإدارتها تلقائياً على جهازك</li>
           <li data-i18n="brand_point_3">إرسال الطلب بضغطة واحدة عبر واتساب</li>
         </ul>
         <div class="perforated-edge" aria-hidden="true"></div>
@@ -111,7 +111,7 @@
         <div class="brand-seal small"><span>م</span></div>
         <div>
           <h1 class="topbar-title" data-i18n="brand_name">مهاب</h1>
-          <p class="topbar-subtitle" data-i18n="brand_subtitle">نظام تسجيل الطلبات</p>
+          <p class="topbar-subtitle" data-i18n="brand_subtitle">نظام تسجيل وإدارة الطلبات</p>
         </div>
       </div>
       <div class="topbar-user">
@@ -124,98 +124,176 @@
       </div>
     </header>
 
-    <div class="dashboard-grid">
+    <div class="dashboard-container">
 
-      <!-- بطاقة نموذج الطلب -->
-      <section class="card order-card">
-        <div class="card-header">
-          <h2 data-i18n="new_order_title">طلب جديد</h2>
-          <span class="card-header-line" aria-hidden="true"></span>
+      <!-- ===================== شريط الإحصائيات (Stats Bar) ===================== -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-total">📦</div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-total">0</span>
+            <span class="stat-label" data-i18n="stat_total">إجمالي الطلبات</span>
+          </div>
         </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-interested">🔥</div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-interested">0</span>
+            <span class="stat-label" data-i18n="stat_interested">عملاء مهتمين</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-morning">☀️</div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-morning">0</span>
+            <span class="stat-label" data-i18n="stat_morning">تواجد المدير صباحاً</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-manager">📩</div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-send-manager">0</span>
+            <span class="stat-label" data-i18n="stat_send_manager">إرسال للمدير</span>
+          </div>
+        </div>
+      </section>
 
-        <form id="order-form" novalidate>
-          <label class="field">
-            <span class="field-label" data-i18n="label_customer_name">اسم العميل</span>
-            <input type="text" id="customer-name" data-i18n-ph="placeholder_customer_name" placeholder="مثال: أحمد محمد" required>
-          </label>
+      <div class="dashboard-grid">
 
-          <label class="field">
-            <span class="field-label" data-i18n="label_customer_phone">رقم الجوال</span>
-            <input type="tel" id="customer-phone" data-i18n-ph="placeholder_customer_phone" placeholder="مثال: 05xxxxxxxx" required>
-          </label>
+        <!-- بطاقة نموذج الطلب -->
+        <section class="card order-card">
+          <div class="card-header">
+            <h2 data-i18n="new_order_title">طلب جديد</h2>
+            <span class="card-header-line" aria-hidden="true"></span>
+          </div>
 
-          <label class="field">
-            <span class="field-label" data-i18n="label_location">الموقع / العنوان</span>
-            <input type="text" id="customer-location" data-i18n-ph="placeholder_location" placeholder="الحي، الشارع، أقرب معلم" required>
-          </label>
-
-          <label class="field">
-            <span class="field-label" data-i18n="label_order_details">تفاصيل الطلب</span>
-            <textarea id="order-details" rows="4" data-i18n-ph="placeholder_order_details" placeholder="اكتب تفاصيل الطلب هنا..." required></textarea>
-          </label>
-
-          <!-- ===================== قسم خيارات ونوعية العميل ===================== -->
-          <div class="classification-box">
-            <h3 class="classification-title" data-i18n="classification_title">تصنيف ونوعية العميل</h3>
-            <div class="checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-interested">
-                <span class="checkbox-custom"></span>
-                <span class="checkbox-text" data-i18n="opt_interested">هل العميل متحمس أو مهتم للفكرة؟</span>
+          <form id="order-form" novalidate>
+            <div class="form-row">
+              <label class="field">
+                <span class="field-label" data-i18n="label_customer_name">اسم العميل</span>
+                <input type="text" id="customer-name" data-i18n-ph="placeholder_customer_name" placeholder="مثال: أحمد محمد" required>
               </label>
 
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-manager-morning">
-                <span class="checkbox-custom"></span>
-                <span class="checkbox-text" data-i18n="opt_manager_morning">المدير موجود في الفترة الصباحية</span>
+              <label class="field">
+                <span class="field-label" data-i18n="label_company_name">اسم الشركة</span>
+                <input type="text" id="customer-company" data-i18n-ph="placeholder_company_name" placeholder="مثال: شركة الأمل" required>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label class="field">
+                <span class="field-label" data-i18n="label_customer_phone">رقم الجوال</span>
+                <input type="tel" id="customer-phone" data-i18n-ph="placeholder_customer_phone" placeholder="مثال: 05xxxxxxxx" required>
               </label>
 
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-send-to-manager">
-                <span class="checkbox-custom"></span>
-                <span class="checkbox-text" data-i18n="opt_send_to_manager">إرسال التفاصيل إلى المدير</span>
+              <label class="field">
+                <span class="field-label" data-i18n="label_location">الموقع / العنوان</span>
+                <input type="text" id="customer-location" data-i18n-ph="placeholder_location" placeholder="الحي، الشارع، أقرب معلم" required>
               </label>
+            </div>
+
+            <label class="field">
+              <span class="field-label" data-i18n="label_order_details">تفاصيل الطلب</span>
+              <textarea id="order-details" rows="3" data-i18n-ph="placeholder_order_details" placeholder="اكتب تفاصيل الطلب هنا..." required></textarea>
+            </label>
+
+            <!-- ===================== قسم خيارات وتصنيف العميل (Modern Switches) ===================== -->
+            <div class="classification-box">
+              <h3 class="classification-title" data-i18n="classification_title">تصنيف ونوعية العميل</h3>
+              <div class="switch-group">
+
+                <label class="switch-item">
+                  <div class="switch-info">
+                    <span class="switch-icon">🔥</span>
+                    <span class="switch-text" data-i18n="opt_interested">هل العميل متحمس أو مهتم للفكرة؟</span>
+                  </div>
+                  <input type="checkbox" id="opt-interested">
+                  <span class="switch-slider"></span>
+                </label>
+
+                <label class="switch-item">
+                  <div class="switch-info">
+                    <span class="switch-icon">☀️</span>
+                    <span class="switch-text" data-i18n="opt_manager_morning">المدير موجود في الفترة الصباحية</span>
+                  </div>
+                  <input type="checkbox" id="opt-manager-morning">
+                  <span class="switch-slider"></span>
+                </label>
+
+                <label class="switch-item">
+                  <div class="switch-info">
+                    <span class="switch-icon">📩</span>
+                    <span class="switch-text" data-i18n="opt_send_to_manager">إرسال التفاصيل إلى المدير</span>
+                  </div>
+                  <input type="checkbox" id="opt-send-to-manager">
+                  <span class="switch-slider"></span>
+                </label>
+
+              </div>
+            </div>
+
+            <p class="form-error" id="order-error"></p>
+
+            <div class="order-actions">
+              <button type="submit" class="btn btn-secondary" data-i18n="btn_save_order">حفظ الطلب</button>
+              <button type="button" id="send-whatsapp-btn" class="btn btn-whatsapp">
+                <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                  <path d="M12.001 2C6.478 2 2 6.478 2 12c0 1.85.51 3.664 1.475 5.243L2 22l4.865-1.437A9.953 9.953 0 0 0 12.001 22C17.523 22 22 17.522 22 12S17.523 2 12.001 2zm0 18.03c-1.652 0-3.267-.44-4.674-1.276l-.335-.198-2.889.853.858-2.812-.218-.344A8.02 8.02 0 0 1 3.97 12c0-4.42 3.6-8.02 8.03-8.02 4.42 0 8.02 3.6 8.02 8.02 0 4.42-3.6 8.03-8.02 8.03z"/>
+                </svg>
+                <span data-i18n="btn_send_whatsapp">إرسال الطلب عبر واتساب</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- بطاقة قائمة الطلبات المحفوظة -->
+        <section class="card orders-list-card">
+          <div class="card-header card-header-flex">
+            <div>
+              <h2 data-i18n="saved_orders_title">الطلبات المحفوظة</h2>
+              <span class="card-header-line" aria-hidden="true"></span>
+            </div>
+            <button id="export-csv-btn" class="btn btn-outline-sm" type="button">
+              📥 <span data-i18n="btn_export_csv">تصدير Excel</span>
+            </button>
+          </div>
+
+          <!-- أدوات البحث والتصفية -->
+          <div class="filter-toolbar">
+            <input type="text" id="search-orders" class="search-input" data-i18n-ph="placeholder_search" placeholder="🔍 بحث في الطلبات..." />
+            
+            <div class="filter-chips">
+              <button class="chip active" data-filter="all" data-i18n="filter_all">الكل</button>
+              <button class="chip" data-filter="interested" data-i18n="filter_interested">🔥 مهتم</button>
+              <button class="chip" data-filter="morning" data-i18n="filter_morning">☀️ صباحاً</button>
+              <button class="chip" data-filter="manager" data-i18n="filter_manager">📩 للمدير</button>
             </div>
           </div>
 
-          <p class="form-error" id="order-error"></p>
-
-          <div class="order-actions">
-            <button type="submit" class="btn btn-secondary" data-i18n="btn_save_order">حفظ الطلب</button>
-            <button type="button" id="send-whatsapp-btn" class="btn btn-whatsapp">
-              <svg class="wa-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                <path d="M12.001 2C6.478 2 2 6.478 2 12c0 1.85.51 3.664 1.475 5.243L2 22l4.865-1.437A9.953 9.953 0 0 0 12.001 22C17.523 22 22 17.522 22 12S17.523 2 12.001 2zm0 18.03c-1.652 0-3.267-.44-4.674-1.276l-.335-.198-2.889.853.858-2.812-.218-.344A8.02 8.02 0 0 1 3.97 12c0-4.42 3.6-8.02 8.03-8.02 4.42 0 8.02 3.6 8.02 8.02 0 4.42-3.6 8.03-8.02 8.03z"/>
-              </svg>
-              <span data-i18n="btn_send_whatsapp">إرسال الطلب عبر واتساب</span>
-            </button>
+          <div id="orders-empty" class="empty-state">
+            <p data-i18n="orders_empty_text">لا توجد طلبات محفوظة بعد.</p>
+            <p class="empty-hint" data-i18n="orders_empty_hint">أضف طلبك الأول من النموذج المجاور.</p>
           </div>
-        </form>
-      </section>
 
-      <!-- بطاقة قائمة الطلبات المحفوظة -->
-      <section class="card orders-list-card">
-        <div class="card-header">
-          <h2 data-i18n="saved_orders_title">الطلبات المحفوظة</h2>
-          <span class="card-header-line" aria-hidden="true"></span>
-        </div>
+          <div id="orders-list" class="orders-list"></div>
+        </section>
 
-        <div id="orders-empty" class="empty-state">
-          <p data-i18n="orders_empty_text">لا توجد طلبات محفوظة بعد.</p>
-          <p class="empty-hint" data-i18n="orders_empty_hint">أضف طلبك الأول من النموذج المجاور.</p>
-        </div>
-
-        <div id="orders-list" class="orders-list"></div>
-      </section>
-
+      </div>
     </div>
   </main>
 
-  <!-- قالب بطاقة الطلب الواحدة (يُستخدم من JavaScript) -->
+  <!-- إشعار توست (Toast Notification) -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- قالب بطاقة الطلب الواحدة -->
   <template id="order-item-template">
     <article class="order-item">
       <div class="order-item-top">
-        <span class="order-item-name"></span>
+        <div>
+          <span class="order-item-name"></span>
+          <span class="order-item-company"></span>
+        </div>
         <span class="order-item-date"></span>
       </div>
       <p class="order-item-row"><strong class="lbl-phone">الجوال:</strong> <span class="order-item-phone"></span></p>
@@ -227,6 +305,7 @@
 
       <div class="order-item-actions">
         <button class="btn btn-whatsapp-mini" type="button">إرسال عبر واتساب</button>
+        <button class="btn btn-copy-mini" type="button">📋 <span class="lbl-copy">نسخ</span></button>
         <button class="btn btn-delete-mini" type="button">حذف</button>
       </div>
       <div class="perforated-edge small" aria-hidden="true"></div>
