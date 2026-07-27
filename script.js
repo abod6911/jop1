@@ -244,6 +244,66 @@ let activeFilter = "all";
 let searchQuery = "";
 
 /* =========================================================
+   تأثيرات الجمالية والترحيب والتوقيت الحي
+   ========================================================= */
+function updateLiveClock() {
+  const clockTextEl = document.getElementById("clock-text");
+  if (!clockTextEl) return;
+
+  const now = new Date();
+  const options = {
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  };
+  
+  clockTextEl.textContent = now.toLocaleDateString(currentLang === "ar" ? "ar-SA" : "en-US", options);
+}
+
+setInterval(updateLiveClock, 1000);
+updateLiveClock();
+
+function updateWelcomeBanner(username) {
+  const isAr = currentLang === "ar";
+  const now = new Date();
+  const hour = now.getHours();
+
+  let timeGreeting = isAr ? "أهلاً بك مجدداً" : "Welcome Back";
+  if (hour >= 5 && hour < 12) {
+    timeGreeting = isAr ? "صباح الخير والنشاط ☀️" : "Good Morning ☀️";
+  } else if (hour >= 12 && hour < 17) {
+    timeGreeting = isAr ? "مساء الخير والبركة 🌤️" : "Good Afternoon 🌤️";
+  } else {
+    timeGreeting = isAr ? "مساء الخير والتميّز 🌙" : "Good Evening 🌙";
+  }
+
+  const greetingLabelEl = document.getElementById("welcome-greeting-label");
+  const displayUsernameEl = document.getElementById("display-username");
+  const welcomeSubtextEl = document.getElementById("welcome-subtext");
+
+  if (greetingLabelEl) greetingLabelEl.textContent = timeGreeting;
+  if (displayUsernameEl) displayUsernameEl.textContent = username || (isAr ? "عابد" : "User");
+  if (welcomeSubtextEl) {
+    welcomeSubtextEl.textContent = isAr 
+      ? "نتمنى لك يوماً حافلاً بالإنجازات والطلبيات الناجحة في منصة مهاب."
+      : "Wishing you a productive and successful day on the Muhab Platform.";
+  }
+}
+
+function triggerCelebration() {
+  if (typeof confetti === "function") {
+    confetti({
+      particleCount: 60,
+      spread: 70,
+      origin: { y: 0.75 },
+      colors: ['#C6952E', '#0E3D3B', '#22A85C', '#E7C877']
+    });
+  }
+}
+
+/* =========================================================
    دالة المزامنة الشاملة والمحترفة مع شيتات جوجل (مرة واحدة فقط)
    ========================================================= */
 function sendOrderToGoogleSheets(orderObj) {
@@ -299,7 +359,6 @@ function sendOrderToGoogleSheets(orderObj) {
   })
   .catch((err) => console.error("Error syncing order:", err))
   .finally(() => {
-    // فتح القفل بعد ثانية واحدة لإتاحة الطلب القادم
     setTimeout(() => { isSyncingToGoogle = false; }, 1200);
   });
 }
@@ -418,6 +477,7 @@ function setLanguage(lang) {
   const username = getSession();
   if (username) {
     welcomeUserEl.textContent = `${t.welcome_user}${username}`;
+    updateWelcomeBanner(username);
   }
 
   if (!pageDashboard.classList.contains("hidden")) {
@@ -579,6 +639,8 @@ function showDashboard(username) {
   pageDashboard.classList.remove("hidden");
   const t = TRANSLATIONS[currentLang];
   welcomeUserEl.textContent = `${t.welcome_user}${username}`;
+  
+  updateWelcomeBanner(username);
   renderOrders();
   updateStats();
 }
@@ -648,6 +710,9 @@ orderForm.addEventListener("submit", function (e) {
   const orders = getOrders();
   orders.unshift(newOrder);
   saveOrders(orders);
+
+  // إطلاق تأثير الألعاب النارية الجمالية
+  triggerCelebration();
 
   // إرسال الطلب مرة واحدة فقط ببيانات كاملة
   sendOrderToGoogleSheets(newOrder);

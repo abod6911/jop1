@@ -7,7 +7,10 @@
 
   <!-- خطوط من جوجل -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Reem+Kufi:wght@400..700&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- مكتبة الألعاب النارية الاحتفالية عند التوثيق -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -108,7 +111,7 @@
   <!-- ===================== لوحة التحكم (تظهر بعد تسجيل الدخول) ===================== -->
   <main id="page-dashboard" class="dashboard-page hidden">
 
-    <!-- الشريط العلوي -->
+    <!-- الشريط العلوي الشفاف العصري -->
     <header class="topbar">
       <div class="topbar-brand">
         <div class="brand-seal small"><span>م</span></div>
@@ -117,20 +120,45 @@
           <p class="topbar-subtitle" data-i18n="brand_subtitle">نظام تسجيل وإدارة الطلبات</p>
         </div>
       </div>
-      <div class="topbar-user">
-        <span id="welcome-user" class="welcome-text"></span>
-        <button id="theme-toggle-dash" class="btn btn-theme" type="button" title="الوضع الليلي/النهاري">
-          <span class="theme-icon">🌙</span>
-        </button>
-        <button id="lang-toggle-dash" class="btn btn-lang" type="button">
-          <span class="lang-icon">🌐</span>
-          <span class="lang-text">English</span>
-        </button>
-        <button id="logout-btn" class="btn btn-ghost" data-i18n="logout">تسجيل الخروج</button>
+
+      <div class="topbar-right-group">
+        <!-- الوقت والتاريخ الحي -->
+        <div class="live-clock-badge" id="live-clock">
+          <span class="clock-icon">⏰</span>
+          <span class="clock-text" id="clock-text">--:--:--</span>
+        </div>
+
+        <div class="topbar-user">
+          <span id="welcome-user" class="welcome-text"></span>
+          <button id="theme-toggle-dash" class="btn btn-theme" type="button" title="الوضع الليلي/النهاري">
+            <span class="theme-icon">🌙</span>
+          </button>
+          <button id="lang-toggle-dash" class="btn btn-lang" type="button">
+            <span class="lang-icon">🌐</span>
+            <span class="lang-text">English</span>
+          </button>
+          <button id="logout-btn" class="btn btn-ghost" data-i18n="logout">تسجيل الخروج</button>
+        </div>
       </div>
     </header>
 
     <div class="dashboard-container">
+
+      <!-- ===================== شريط الترحيب الفاخر المتحرك ===================== -->
+      <section class="welcome-banner">
+        <div class="welcome-banner-content">
+          <div class="welcome-badge">
+            <span class="welcome-icon">✨</span>
+            <span class="welcome-greeting-label" id="welcome-greeting-label">مرحباً بك مجدداً</span>
+          </div>
+          <h2 class="welcome-heading" id="welcome-heading">أهلاً بك، <span class="highlight-username" id="display-username">عابد</span> 👋</h2>
+          <p class="welcome-subtext" id="welcome-subtext">نتمنى لك يوماً حافلاً بالإنجازات والطلبيات الناجحة في منصة مهاب.</p>
+        </div>
+        <div class="welcome-banner-decor" aria-hidden="true">
+          <div class="gold-sparkle">✦</div>
+          <div class="seal-watermark-mini">م</div>
+        </div>
+      </section>
 
       <!-- ===================== شريط الإحصائيات (Stats Bar) ===================== -->
       <section class="stats-grid">
