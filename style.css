@@ -25,6 +25,26 @@
   --font-body: "Tajawal", "Outfit", sans-serif;
 }
 
+/* =========================================================
+   الوضع المظلم (Dark Theme Tokens)
+   ========================================================= */
+[data-theme="dark"] {
+  --teal-deep:   #195854;
+  --teal-mid:    #22706A;
+  --teal-soft:   #2C8B82;
+  --gold:        #DCA63A;
+  --gold-light:  #F0DB96;
+  --ink:         #E4ECE9;
+  --ink-soft:    #9CB3AA;
+  --bg:          #0C1615;
+  --card:        #142422;
+  --border:      #223936;
+  --whatsapp:    #24B062;
+  --whatsapp-dark:#1E9653;
+  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 40px -15px rgba(0, 0, 0, 0.8);
+}
+
 html[lang="en"] {
   --font-display: "Outfit", "Tajawal", sans-serif;
   --font-body: "Outfit", "Tajawal", sans-serif;
@@ -39,6 +59,7 @@ html, body{
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 body{
@@ -49,7 +70,7 @@ body{
 .hidden{ display:none !important; }
 
 button{ font-family: inherit; cursor:pointer; }
-input, textarea{ font-family: inherit; }
+input, textarea, select{ font-family: inherit; }
 
 /* =========================================================
    ختم العلامة المائية في خلفية الصفحة
@@ -64,6 +85,8 @@ input, textarea{ font-family: inherit; }
   z-index:0;
   opacity:0.03;
 }
+[data-theme="dark"] .brand-watermark { opacity: 0.05; }
+
 .stamp-ring{
   width: 620px;
   height:620px;
@@ -206,6 +229,7 @@ input, textarea{ font-family: inherit; }
 .panel-header-actions{
   display:flex;
   justify-content:flex-end;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
@@ -262,21 +286,21 @@ input, textarea{ font-family: inherit; }
   font-weight:700;
   color: var(--ink);
 }
-.field input, .field textarea{
+.field input, .field textarea, .field select{
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 11px 14px;
   font-size: 0.93rem;
-  background: #FCFDFC;
+  background: var(--card);
   color: var(--ink);
   outline:none;
   transition: border-color .15s ease, box-shadow .15s ease;
 }
-.field input:focus, .field textarea:focus{
+.field input:focus, .field textarea:focus, .field select:focus{
   border-color: var(--teal-soft);
   box-shadow: 0 0 0 3px rgba(30,111,102,0.15);
 }
-.field textarea{ resize: vertical; min-height: 85px; }
+.field textarea{ resize: vertical; min-height: 80px; }
 
 .form-error{
   color: var(--danger);
@@ -295,7 +319,7 @@ input, textarea{ font-family: inherit; }
    قسم المفاتيح الحديثة لتصنيف العميل (Modern Switches)
    ========================================================= */
 .classification-box {
-  background: #F8FAF9;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 16px;
@@ -323,7 +347,7 @@ input, textarea{ font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #FFFFFF;
+  background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
@@ -360,7 +384,7 @@ input, textarea{ font-family: inherit; }
 .switch-slider {
   width: 42px;
   height: 24px;
-  background-color: #D1DDD7;
+  background-color: var(--border);
   border-radius: 999px;
   position: relative;
   transition: background-color 0.25s ease;
@@ -398,7 +422,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 
 /* =========================================================
-   الأزرار وزر اللغة
+   الأزرار وزر الثيم واللغة
    ========================================================= */
 .btn{
   border:none;
@@ -449,8 +473,21 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   border-color: var(--teal-deep);
 }
 
+.btn-theme {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 7px 11px;
+  font-size: 1rem;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+.btn-theme:hover {
+  border-color: var(--teal-soft);
+}
+
 .btn-lang {
-  background: #F0F4F2;
+  background: var(--bg);
   border: 1px solid var(--border);
   color: var(--teal-deep);
   padding: 7px 14px;
@@ -482,7 +519,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 .btn-whatsapp-mini:hover{ background: var(--whatsapp-dark); }
 
 .btn-copy-mini {
-  background: #F0F4F2;
+  background: var(--bg);
   color: var(--ink);
   border: 1px solid var(--border);
   padding: 7px 12px;
@@ -493,6 +530,20 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   background: var(--teal-deep);
   color: #fff;
   border-color: var(--teal-deep);
+}
+
+.btn-print-mini {
+  background: var(--bg);
+  color: var(--teal-deep);
+  border: 1px solid var(--border);
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  border-radius: 999px;
+}
+.btn-print-mini:hover {
+  background: var(--gold);
+  color: #1a1305;
+  border-color: var(--gold);
 }
 
 .btn-delete-mini{
@@ -545,7 +596,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 .topbar-user{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
 .welcome-text{
   font-size:0.9rem;
@@ -554,7 +605,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 
 .dashboard-container {
-  max-width: 1220px;
+  max-width: 1240px;
   margin: 28px auto 0;
   padding: 0 28px;
 }
@@ -562,8 +613,8 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 /* --- شريط الإحصائيات (Stats Bar) --- */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
   margin-bottom: 24px;
 }
 
@@ -571,10 +622,10 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
+  padding: 14px 16px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   box-shadow: 0 4px 15px -8px rgba(14,61,59,0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -584,14 +635,14 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 
 .stat-icon {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
-  background: #F2F6F4;
+  font-size: 1.3rem;
+  background: var(--bg);
   flex-shrink: 0;
 }
 
@@ -601,14 +652,14 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 
 .stat-value {
-  font-size: 1.55rem;
+  font-size: 1.45rem;
   font-weight: 900;
   color: var(--teal-deep);
   line-height: 1.1;
 }
 
 .stat-label {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--ink-soft);
   margin-top: 2px;
 }
@@ -616,7 +667,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 /* --- شبكة النموذج والبطاقات --- */
 .dashboard-grid{
   display:grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1.15fr 1fr;
   gap: 24px;
   align-items:start;
 }
@@ -672,7 +723,8 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 0.88rem;
-  background: #FCFDFC;
+  background: var(--bg);
+  color: var(--ink);
   outline: none;
   transition: border-color 0.15s ease;
 }
@@ -697,7 +749,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   transition: all 0.15s ease;
 }
 .chip:hover {
-  background: #E6EDE9;
+  background: var(--border);
 }
 .chip.active {
   background: var(--teal-deep);
@@ -728,7 +780,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 16px 16px 4px;
-  background: #FBFDFC;
+  background: var(--card);
 }
 .order-item-top{
   display:flex;
@@ -785,14 +837,14 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   gap: 4px;
 }
 .tag-badge.active {
-  background: #E8F5E9;
-  color: #2E7D32;
-  border: 1px solid #A5D6A7;
+  background: rgba(34, 168, 92, 0.12);
+  color: var(--whatsapp);
+  border: 1px solid rgba(34, 168, 92, 0.3);
 }
 .tag-badge.inactive {
-  background: #F5F5F5;
-  color: #757575;
-  border: 1px solid #E0E0E0;
+  background: var(--bg);
+  color: var(--ink-soft);
+  border: 1px solid var(--border);
 }
 
 .order-item-actions{
@@ -824,14 +876,144 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 
 /* =========================================================
+   تنسيق الفاتورة الرسمية للطباعة (@media print)
+   ========================================================= */
+.print-area { display: none; }
+
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area {
+    display: block !important;
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+    padding: 24px;
+    background: #fff !important;
+    color: #111 !important;
+    font-family: var(--font-body) !important;
+  }
+
+  .invoice-card {
+    border: 2px solid #0E3D3B;
+    border-radius: 12px;
+    padding: 28px;
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    position: relative;
+  }
+
+  .invoice-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #C6952E;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .invoice-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .invoice-logo-seal {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: #0E3D3B;
+    color: #E7C877;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .invoice-title-block h1 {
+    font-size: 1.6rem; margin: 0; color: #0E3D3B;
+  }
+  .invoice-title-block p {
+    font-size: 0.85rem; margin: 2px 0 0; color: #555;
+  }
+
+  .invoice-meta {
+    text-align: end;
+    font-size: 0.85rem;
+    color: #444;
+  }
+
+  .invoice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    background: #F4F7F5;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .invoice-field {
+    font-size: 0.92rem;
+    margin: 4px 0;
+  }
+
+  .invoice-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0E3D3B;
+    border-bottom: 1px solid #DDE6E1;
+    padding-bottom: 6px;
+    margin: 18px 0 10px;
+  }
+
+  .invoice-details-box {
+    background: #FFF;
+    border: 1px solid #CCC;
+    border-radius: 6px;
+    padding: 14px;
+    min-height: 100px;
+    white-space: pre-wrap;
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+
+  .invoice-tags {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .invoice-tag-item {
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid #AAA;
+  }
+
+  .invoice-footer {
+    margin-top: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-top: 1px dashed #AAA;
+    padding-top: 16px;
+  }
+  .invoice-sign-box {
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  .invoice-sign-line {
+    width: 160px;
+    border-bottom: 1.5px solid #000;
+    margin-top: 30px;
+  }
+}
+
+/* =========================================================
    الاستجابة للشاشات الصغيرة (موبايل)
    ========================================================= */
-@media (max-width: 992px){
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1050px){
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
   .dashboard-grid{ grid-template-columns: 1fr; }
 }
 
 @media (max-width: 860px){
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .auth-wrapper{ grid-template-columns: 1fr; }
   .auth-brand{ padding: 36px 28px 44px; }
   .brand-name{ font-size:2.2rem; }

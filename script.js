@@ -8,11 +8,12 @@ const STORAGE_KEYS = {
   USERS: "muhab_users",
   SESSION: "muhab_session",
   ORDERS: "muhab_orders",
-  LANG: "muhab_lang"
+  LANG: "muhab_lang",
+  THEME: "muhab_theme"
 };
 
 /* =========================================================
-   قاموس الترجمات (Arabic & English Translations)
+   قاموس الترجمات الشامل (Arabic & English Translations)
    ========================================================= */
 const TRANSLATIONS = {
   ar: {
@@ -52,6 +53,7 @@ const TRANSLATIONS = {
     stat_interested: "عملاء مهتمين",
     stat_morning: "تواجد المدير صباحاً",
     stat_send_manager: "إرسال للمدير",
+    stat_followup: "تذكير ومتابعة",
     new_order_title: "طلب جديد",
     label_customer_name: "اسم العميل",
     placeholder_customer_name: "مثال: أحمد محمد",
@@ -61,6 +63,11 @@ const TRANSLATIONS = {
     placeholder_customer_phone: "مثال: 05xxxxxxxx",
     label_location: "الموقع / العنوان",
     placeholder_location: "الحي، الشارع، أقرب معلم",
+    label_followup_date: "موعد وتاريخ المتابعة",
+    label_wa_template: "قالب رسالة الواتساب",
+    template_full: "📌 طلب جديد شامل",
+    template_manager: "☀️ موعد المدير الصباحي",
+    template_followup: "🔄 رسالة متابعة للعميل",
     label_order_details: "تفاصيل الطلب",
     placeholder_order_details: "اكتب تفاصيل الطلب هنا...",
     classification_title: "تصنيف ونوعية العميل",
@@ -76,13 +83,16 @@ const TRANSLATIONS = {
     filter_interested: "🔥 مهتم",
     filter_morning: "☀️ صباحاً",
     filter_manager: "📩 للمدير",
+    filter_followup: "📅 متابعة",
     orders_empty_text: "لا توجد طلبات محفوظة بعد.",
     orders_empty_hint: "أضف طلبك الأول من النموذج المجاور.",
     err_order_fill: "الرجاء تعبئة جميع حقول الطلب (الاسم، الشركة، الجوال، الموقع، التفاصيل).",
     lbl_phone: "الجوال:",
     lbl_location: "الموقع:",
     lbl_company: "الشركة:",
-    lbl_copy: "نسخ الرسالة",
+    lbl_followup: "المتابعة:",
+    lbl_copy: "نسخ",
+    lbl_print: "طباعة",
     btn_delete: "حذف",
     btn_whatsapp_mini: "إرسال عبر واتساب",
     toast_copied: "📋 تم نسخ نص رسالة الواتساب بنجاح!",
@@ -99,6 +109,7 @@ const TRANSLATIONS = {
     wa_interested: "• متحمس/مهتم للفكرة:",
     wa_manager_morning: "• المدير موجود صباحاً:",
     wa_send_to_manager: "• إرسال التفاصيل للمدير:",
+    wa_followup_label: "📅 *تاريخ موعد المتابعة:*",
     tag_interested: "متحمس للفكرة",
     tag_manager_morning: "المدير صباحاً",
     tag_send_manager: "إرسال للمدير"
@@ -140,6 +151,7 @@ const TRANSLATIONS = {
     stat_interested: "Interested Clients",
     stat_morning: "Morning Manager",
     stat_send_manager: "Send to Manager",
+    stat_followup: "Reminders & Follow-ups",
     new_order_title: "New Order",
     label_customer_name: "Customer Name",
     placeholder_customer_name: "e.g. John Doe",
@@ -149,6 +161,11 @@ const TRANSLATIONS = {
     placeholder_customer_phone: "e.g. 05xxxxxxxx",
     label_location: "Location / Address",
     placeholder_location: "District, street, nearest landmark",
+    label_followup_date: "Follow-up Date & Time",
+    label_wa_template: "WhatsApp Message Template",
+    template_full: "📌 Full New Order",
+    template_manager: "☀️ Morning Manager Meeting",
+    template_followup: "🔄 Client Follow-up Reminder",
     label_order_details: "Order Details",
     placeholder_order_details: "Enter order details here...",
     classification_title: "Customer Classification",
@@ -164,13 +181,16 @@ const TRANSLATIONS = {
     filter_interested: "🔥 Interested",
     filter_morning: "☀️ Morning",
     filter_manager: "📩 To Manager",
+    filter_followup: "📅 Follow-up",
     orders_empty_text: "No saved orders yet.",
     orders_empty_hint: "Add your first order using the adjacent form.",
     err_order_fill: "Please fill in all order fields (Name, Company, Phone, Location, Details).",
     lbl_phone: "Phone:",
     lbl_location: "Location:",
     lbl_company: "Company:",
-    lbl_copy: "Copy Message",
+    lbl_followup: "Follow-up:",
+    lbl_copy: "Copy",
+    lbl_print: "Print",
     btn_delete: "Delete",
     btn_whatsapp_mini: "Send via WhatsApp",
     toast_copied: "📋 WhatsApp message copied successfully!",
@@ -187,6 +207,7 @@ const TRANSLATIONS = {
     wa_interested: "• Interested in idea:",
     wa_manager_morning: "• Manager present morning:",
     wa_send_to_manager: "• Send details to manager:",
+    wa_followup_label: "📅 *Follow-up Date:*",
     tag_interested: "Interested in Idea",
     tag_manager_morning: "Manager Morning",
     tag_send_manager: "Send to Manager"
@@ -194,13 +215,32 @@ const TRANSLATIONS = {
 };
 
 let currentLang = localStorage.getItem(STORAGE_KEYS.LANG) || "ar";
+let currentTheme = localStorage.getItem(STORAGE_KEYS.THEME) || "light";
 let activeFilter = "all";
 let searchQuery = "";
 
 /* =========================================================
+   إدارة الوضع الليلي/النهاري (Dark Mode / Light Mode)
+   ========================================================= */
+function setTheme(theme) {
+  currentTheme = theme;
+  localStorage.setItem(STORAGE_KEYS.THEME, theme);
+  document.documentElement.setAttribute("data-theme", theme);
+
+  const iconText = theme === "dark" ? "☀️" : "🌙";
+  document.querySelectorAll(".btn-theme .theme-icon").forEach(el => {
+    el.textContent = iconText;
+  });
+}
+
+function toggleTheme() {
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  setTheme(newTheme);
+}
+
+/* =========================================================
    دوال مساعدة للتعامل مع التخزين المحلي (localStorage)
    ========================================================= */
-
 function getUsers() {
   const raw = localStorage.getItem(STORAGE_KEYS.USERS);
   return raw ? JSON.parse(raw) : [];
@@ -241,11 +281,13 @@ function updateStats() {
   const interested = orders.filter(o => o.optInterested).length;
   const morning = orders.filter(o => o.optManagerMorning).length;
   const sendManager = orders.filter(o => o.optSendToManager).length;
+  const followup = orders.filter(o => o.followupDate).length;
 
   document.getElementById("stat-total").textContent = total;
   document.getElementById("stat-interested").textContent = interested;
   document.getElementById("stat-morning").textContent = morning;
   document.getElementById("stat-send-manager").textContent = sendManager;
+  document.getElementById("stat-followup").textContent = followup;
 }
 
 /* =========================================================
@@ -323,6 +365,8 @@ const welcomeUserEl = document.getElementById("welcome-user");
 const logoutBtn = document.getElementById("logout-btn");
 const langToggleLogin = document.getElementById("lang-toggle-login");
 const langToggleDash = document.getElementById("lang-toggle-dash");
+const themeToggleLogin = document.getElementById("theme-toggle-login");
+const themeToggleDash = document.getElementById("theme-toggle-dash");
 
 const orderForm = document.getElementById("order-form");
 const orderError = document.getElementById("order-error");
@@ -331,12 +375,15 @@ const sendWhatsappBtn = document.getElementById("send-whatsapp-btn");
 const ordersListEl = document.getElementById("orders-list");
 const ordersEmptyEl = document.getElementById("orders-empty");
 const orderItemTemplate = document.getElementById("order-item-template");
+const printAreaEl = document.getElementById("print-area");
 
 const searchOrdersInput = document.getElementById("search-orders");
 const exportCsvBtn = document.getElementById("export-csv-btn");
 
 if (langToggleLogin) langToggleLogin.addEventListener("click", toggleLanguage);
 if (langToggleDash) langToggleDash.addEventListener("click", toggleLanguage);
+if (themeToggleLogin) themeToggleLogin.addEventListener("click", toggleTheme);
+if (themeToggleDash) themeToggleDash.addEventListener("click", toggleTheme);
 
 /* =========================================================
    التبديل بين تبويبَي "تسجيل الدخول" و"حساب جديد"
@@ -457,7 +504,7 @@ function showLoginPage() {
 }
 
 /* =========================================================
-   قراءة بيانات نموذج الطلب الحالي (شاملاً اسم الشركة والخيارات)
+   قراءة بيانات نموذج الطلب وقوالب الرسائل
    ========================================================= */
 function readOrderFormData() {
   return {
@@ -465,6 +512,8 @@ function readOrderFormData() {
     company: document.getElementById("customer-company").value.trim(),
     phone: document.getElementById("customer-phone").value.trim(),
     location: document.getElementById("customer-location").value.trim(),
+    followupDate: document.getElementById("followup-date").value,
+    waTemplate: document.getElementById("wa-template").value,
     details: document.getElementById("order-details").value.trim(),
     optInterested: document.getElementById("opt-interested").checked,
     optManagerMorning: document.getElementById("opt-manager-morning").checked,
@@ -499,6 +548,8 @@ orderForm.addEventListener("submit", function (e) {
     company: data.company,
     phone: data.phone,
     location: data.location,
+    followupDate: data.followupDate,
+    waTemplate: data.waTemplate,
     details: data.details,
     optInterested: data.optInterested,
     optManagerMorning: data.optManagerMorning,
@@ -515,7 +566,7 @@ orderForm.addEventListener("submit", function (e) {
 });
 
 /* =========================================================
-   تنسيق رسالة واتساب وإرسالها
+   تنسيق رسالة واتساب حسب القالب المختار
    ========================================================= */
 function buildWhatsappMessage(data) {
   const t = TRANSLATIONS[currentLang];
@@ -526,13 +577,29 @@ function buildWhatsappMessage(data) {
   const managerMorningStatus = data.optManagerMorning ? yesStr : noStr;
   const sendToManagerStatus = data.optSendToManager ? yesStr : noStr;
 
+  const template = data.waTemplate || "full";
+
+  let header = t.wa_title;
+  if (template === "manager") {
+    header = currentLang === "ar" ? "*تنسيق موعد الفترة الصباحية للمدير - مهاب*" : "*Manager Morning Appointment - Muhab*";
+  } else if (template === "followup") {
+    header = currentLang === "ar" ? "*تذكير ومتابعة الطلب - مهاب*" : "*Order Follow-up Reminder - Muhab*";
+  }
+
+  let followupLine = "";
+  if (data.followupDate) {
+    const formattedFollowup = new Date(data.followupDate).toLocaleString(currentLang === "ar" ? "ar-SA" : "en-US");
+    followupLine = `${t.wa_followup_label} ${formattedFollowup}\n`;
+  }
+
   return (
-    `${t.wa_title}\n` +
+    `${header}\n` +
     `--------------------------\n` +
     `${t.wa_name} ${data.name}\n` +
     `${t.wa_company} ${data.company || "-"}\n` +
     `${t.wa_phone} ${data.phone}\n` +
     `${t.wa_location} ${data.location}\n` +
+    followupLine +
     `${t.wa_details}\n${data.details}\n` +
     `--------------------------\n` +
     `${t.wa_classification}\n` +
@@ -564,6 +631,69 @@ sendWhatsappBtn.addEventListener("click", function () {
 });
 
 /* =========================================================
+   طباعة فاتورة وسند طلب رسمي محترف (@media print)
+   ========================================================= */
+function printOrderReceipt(order) {
+  const t = TRANSLATIONS[currentLang];
+  const yesStr = t.yes;
+  const noStr = t.no;
+
+  const followupFormatted = order.followupDate
+    ? new Date(order.followupDate).toLocaleString(currentLang === "ar" ? "ar-SA" : "en-US")
+    : (currentLang === "ar" ? "غير محدد" : "Not specified");
+
+  const printHtml = `
+    <div class="invoice-card">
+      <div class="invoice-header">
+        <div class="invoice-logo">
+          <div class="invoice-logo-seal">م</div>
+          <div class="invoice-title-block">
+            <h1>${t.brand_name}</h1>
+            <p>${currentLang === "ar" ? "سند تسجيل وإدارة طلبات العملاء" : "Customer Order Registration Receipt"}</p>
+          </div>
+        </div>
+        <div class="invoice-meta">
+          <div><strong>${currentLang === "ar" ? "رقم الطلب:" : "Order ID:"}</strong> #${order.id.slice(-6)}</div>
+          <div><strong>${currentLang === "ar" ? "التاريخ:" : "Date:"}</strong> ${order.createdAt}</div>
+        </div>
+      </div>
+
+      <div class="invoice-grid">
+        <div class="invoice-field"><strong>${t.label_customer_name}:</strong> ${order.name}</div>
+        <div class="invoice-field"><strong>${t.label_company_name}:</strong> ${order.company || "-"}</div>
+        <div class="invoice-field"><strong>${t.label_customer_phone}:</strong> ${order.phone}</div>
+        <div class="invoice-field"><strong>${t.label_location}:</strong> ${order.location}</div>
+        <div class="invoice-field"><strong>${t.label_followup_date}:</strong> ${followupFormatted}</div>
+      </div>
+
+      <div class="invoice-section-title">${t.classification_title}</div>
+      <div class="invoice-tags">
+        <span class="invoice-tag-item">${t.opt_interested}: <strong>${order.optInterested ? yesStr : noStr}</strong></span>
+        <span class="invoice-tag-item">${t.opt_manager_morning}: <strong>${order.optManagerMorning ? yesStr : noStr}</strong></span>
+        <span class="invoice-tag-item">${t.opt_send_to_manager}: <strong>${order.optSendToManager ? yesStr : noStr}</strong></span>
+      </div>
+
+      <div class="invoice-section-title">${t.label_order_details}</div>
+      <div class="invoice-details-box">${order.details}</div>
+
+      <div class="invoice-footer">
+        <div class="invoice-sign-box">
+          <div>${currentLang === "ar" ? "توقيع ملمّس الطلب / المسؤول" : "Authorized Agent Signature"}</div>
+          <div class="invoice-sign-line"></div>
+        </div>
+        <div class="invoice-sign-box">
+          <div>${currentLang === "ar" ? "ختم المؤسسة" : "Company Stamp"}</div>
+          <div class="invoice-sign-line"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  printAreaEl.innerHTML = printHtml;
+  window.print();
+}
+
+/* =========================================================
    البحث والتصفية في قائمة الطلبات المحفوظة
    ========================================================= */
 if (searchOrdersInput) {
@@ -589,7 +719,6 @@ function renderOrders() {
   let orders = getOrders();
   const t = TRANSLATIONS[currentLang];
 
-  // تصفية حسب البحث النصي
   if (searchQuery) {
     orders = orders.filter(o =>
       (o.name && o.name.toLowerCase().includes(searchQuery)) ||
@@ -600,13 +729,14 @@ function renderOrders() {
     );
   }
 
-  // تصفية حسب الخيارات النشطة
   if (activeFilter === "interested") {
     orders = orders.filter(o => o.optInterested);
   } else if (activeFilter === "morning") {
     orders = orders.filter(o => o.optManagerMorning);
   } else if (activeFilter === "manager") {
     orders = orders.filter(o => o.optSendToManager);
+  } else if (activeFilter === "followup") {
+    orders = orders.filter(o => o.followupDate);
   }
 
   ordersEmptyEl.classList.toggle("hidden", orders.length > 0);
@@ -620,14 +750,23 @@ function renderOrders() {
     clone.querySelector(".order-item-date").textContent = order.createdAt;
     clone.querySelector(".order-item-phone").textContent = order.phone;
     clone.querySelector(".order-item-location").textContent = order.location;
+
+    const followupRow = clone.querySelector(".order-item-followup-row");
+    if (order.followupDate && followupRow) {
+      followupRow.classList.remove("hidden");
+      const formattedDate = new Date(order.followupDate).toLocaleString(currentLang === "ar" ? "ar-SA" : "en-US");
+      clone.querySelector(".order-item-followup").textContent = formattedDate;
+    }
+
     clone.querySelector(".order-item-details").textContent = order.details;
 
     const lblPhone = clone.querySelector(".lbl-phone");
     const lblLocation = clone.querySelector(".lbl-location");
+    const lblFollowup = clone.querySelector(".lbl-followup");
     if (lblPhone) lblPhone.textContent = t.lbl_phone;
     if (lblLocation) lblLocation.textContent = t.lbl_location;
+    if (lblFollowup) lblFollowup.textContent = t.lbl_followup;
 
-    // شارات تصنيف العميل
     const tagsContainer = clone.querySelector(".order-item-tags");
     if (tagsContainer) {
       tagsContainer.appendChild(createTagBadge(t.tag_interested, order.optInterested));
@@ -637,6 +776,7 @@ function renderOrders() {
 
     const btnWa = clone.querySelector(".btn-whatsapp-mini");
     const btnCopy = clone.querySelector(".btn-copy-mini");
+    const btnPrint = clone.querySelector(".btn-print-mini");
     const btnDel = clone.querySelector(".btn-delete-mini");
 
     if (btnWa) {
@@ -652,6 +792,11 @@ function renderOrders() {
           showToast(t.toast_copied);
         });
       });
+    }
+
+    if (btnPrint) {
+      btnPrint.querySelector(".lbl-print").textContent = t.lbl_print;
+      btnPrint.addEventListener("click", () => printOrderReceipt(order));
     }
 
     if (btnDel) {
@@ -684,21 +829,22 @@ if (exportCsvBtn) {
     const orders = getOrders();
     if (orders.length === 0) return;
 
-    let csvContent = "\uFEFF"; // UTF-8 BOM for Excel Arabic support
-    csvContent += "اسم العميل,اسم الشركة,رقم الجوال,الموقع,تفاصيل الطلب,مهتم بالفكرة,المدير صباحاً,إرسال للمدير,تاريخ الإنشاء\n";
+    let csvContent = "\uFEFF";
+    csvContent += "اسم العميل,اسم الشركة,رقم الجوال,الموقع,تاريخ المتابعة,تفاصيل الطلب,مهتم بالفكرة,المدير صباحاً,إرسال للمدير,تاريخ الإنشاء\n";
 
     orders.forEach(o => {
       const name = `"${(o.name || "").replace(/"/g, '""')}"`;
       const company = `"${(o.company || "").replace(/"/g, '""')}"`;
       const phone = `"${(o.phone || "").replace(/"/g, '""')}"`;
       const location = `"${(o.location || "").replace(/"/g, '""')}"`;
+      const followup = `"${(o.followupDate || "").replace(/"/g, '""')}"`;
       const details = `"${(o.details || "").replace(/"/g, '""')}"`;
       const interested = o.optInterested ? "نعم" : "لا";
       const morning = o.optManagerMorning ? "نعم" : "لا";
       const sendManager = o.optSendToManager ? "نعم" : "لا";
       const date = `"${o.createdAt || ""}"`;
 
-      csvContent += `${name},${company},${phone},${location},${details},${interested},${morning},${sendManager},${date}\n`;
+      csvContent += `${name},${company},${phone},${location},${followup},${details},${interested},${morning},${sendManager},${date}\n`;
     });
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -715,9 +861,10 @@ if (exportCsvBtn) {
 }
 
 /* =========================================================
-   تهيئة الجلسة واللغة عند تحميل الصفحة
+   تهيئة الجلسة واللغة والثيم عند تحميل الصفحة
    ========================================================= */
 (function init() {
+  setTheme(currentTheme);
   setLanguage(currentLang);
 
   const currentUser = getSession();

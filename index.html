@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,6 +42,9 @@
       <!-- اللوحة الجانبية: نموذج الدخول -->
       <section class="auth-form-panel">
         <div class="panel-header-actions">
+          <button id="theme-toggle-login" class="btn btn-theme" type="button" title="الوضع الليلي/النهاري">
+            <span class="theme-icon">🌙</span>
+          </button>
           <button id="lang-toggle-login" class="btn btn-lang" type="button">
             <span class="lang-icon">🌐</span>
             <span class="lang-text">English</span>
@@ -116,6 +119,9 @@
       </div>
       <div class="topbar-user">
         <span id="welcome-user" class="welcome-text"></span>
+        <button id="theme-toggle-dash" class="btn btn-theme" type="button" title="الوضع الليلي/النهاري">
+          <span class="theme-icon">🌙</span>
+        </button>
         <button id="lang-toggle-dash" class="btn btn-lang" type="button">
           <span class="lang-icon">🌐</span>
           <span class="lang-text">English</span>
@@ -156,6 +162,13 @@
             <span class="stat-label" data-i18n="stat_send_manager">إرسال للمدير</span>
           </div>
         </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-followup">📅</div>
+          <div class="stat-info">
+            <span class="stat-value" id="stat-followup">0</span>
+            <span class="stat-label" data-i18n="stat_followup">تذكير ومتابعة</span>
+          </div>
+        </div>
       </section>
 
       <div class="dashboard-grid">
@@ -189,6 +202,22 @@
               <label class="field">
                 <span class="field-label" data-i18n="label_location">الموقع / العنوان</span>
                 <input type="text" id="customer-location" data-i18n-ph="placeholder_location" placeholder="الحي، الشارع، أقرب معلم" required>
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label class="field">
+                <span class="field-label" data-i18n="label_followup_date">موعد وتاريخ المتابعة</span>
+                <input type="datetime-local" id="followup-date">
+              </label>
+
+              <label class="field">
+                <span class="field-label" data-i18n="label_wa_template">قالب رسالة الواتساب</span>
+                <select id="wa-template">
+                  <option value="full" data-i18n="template_full">📌 طلب جديد شامل</option>
+                  <option value="manager" data-i18n="template_manager">☀️ موعد المدير الصباحي</option>
+                  <option value="followup" data-i18n="template_followup">🔄 رسالة متابعة للعميل</option>
+                </select>
               </label>
             </div>
 
@@ -268,6 +297,7 @@
               <button class="chip" data-filter="interested" data-i18n="filter_interested">🔥 مهتم</button>
               <button class="chip" data-filter="morning" data-i18n="filter_morning">☀️ صباحاً</button>
               <button class="chip" data-filter="manager" data-i18n="filter_manager">📩 للمدير</button>
+              <button class="chip" data-filter="followup" data-i18n="filter_followup">📅 متابعة</button>
             </div>
           </div>
 
@@ -286,6 +316,9 @@
   <!-- إشعار توست (Toast Notification) -->
   <div id="toast" class="toast hidden"></div>
 
+  <!-- ===================== الفاتورة الرسمية للطباعة (Printable Invoice Template) ===================== -->
+  <div id="print-area" class="print-area"></div>
+
   <!-- قالب بطاقة الطلب الواحدة -->
   <template id="order-item-template">
     <article class="order-item">
@@ -298,6 +331,7 @@
       </div>
       <p class="order-item-row"><strong class="lbl-phone">الجوال:</strong> <span class="order-item-phone"></span></p>
       <p class="order-item-row"><strong class="lbl-location">الموقع:</strong> <span class="order-item-location"></span></p>
+      <p class="order-item-row order-item-followup-row hidden"><strong class="lbl-followup">المتابعة:</strong> <span class="order-item-followup"></span></p>
       <p class="order-item-details"></p>
       
       <!-- شارات التصنيف -->
@@ -306,6 +340,7 @@
       <div class="order-item-actions">
         <button class="btn btn-whatsapp-mini" type="button">إرسال عبر واتساب</button>
         <button class="btn btn-copy-mini" type="button">📋 <span class="lbl-copy">نسخ</span></button>
+        <button class="btn btn-print-mini" type="button">🖨️ <span class="lbl-print">طباعة</span></button>
         <button class="btn btn-delete-mini" type="button">حذف</button>
       </div>
       <div class="perforated-edge small" aria-hidden="true"></div>
