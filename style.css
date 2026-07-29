@@ -52,8 +52,9 @@ html[lang="en"] {
 
 *, *::before, *::after {
   box-sizing: border-box !important;
-  max-width: 100%;
 }
+
+img, video { max-width: 100%; height: auto; }
 
 html, body{
   margin:0;
@@ -66,6 +67,7 @@ html, body{
   font-family: var(--font-body);
   transition: background 0.25s ease, color 0.25s ease;
   overflow-x: hidden !important;
+  overflow-wrap: break-word;
   -webkit-text-size-adjust: 100%;
 }
 

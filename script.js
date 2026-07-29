@@ -6,7 +6,7 @@ const WHATSAPP_NUMBER = "966572563602";
 
 // رابط تطبيق جوجل سكريبت لربط البيانات مباشرة بشيتات جوجل (Google Sheet Sync URL)
 const webAppUrl = "https://script.google.com/macros/s/AKfycbyGKKCoyppmGfmDxk0EQe-Ftn77mtZUSvLAkcrQ-x4kfXehM1SvS31GaoqHj__9xlSdKw/exec";
-const GOOGLE_SHEET_WEB_APP_URL = webAppUrl;
+
 
 const STORAGE_KEYS = {
   USERS: "muhab_users",
@@ -17,6 +17,7 @@ const STORAGE_KEYS = {
 };
 
 let isSyncingToGoogle = false; // لمنع التكرار والإرسال المزدوج (Single Send Lock)
+let clockIntervalId = null; // مرجع للساعة الحية لإيقافها عند تسجيل الخروج
 
 /* =========================================================
    قاموس الترجمات الشامل (Arabic & English Translations)
@@ -262,8 +263,7 @@ function updateLiveClock() {
   clockTextEl.textContent = now.toLocaleDateString(currentLang === "ar" ? "ar-SA" : "en-US", options);
 }
 
-setInterval(updateLiveClock, 1000);
-updateLiveClock();
+// الساعة الحية تبدأ فقط عند عرض لوحة التحكم (تُدار في showDashboard/showLoginPage)
 
 function updateWelcomeBanner(username) {
   const isAr = currentLang === "ar";
@@ -307,51 +307,38 @@ function triggerCelebration() {
    دالة المزامنة الشاملة والمحترفة مع شيتات جوجل (مرة واحدة فقط)
    ========================================================= */
 function sendOrderToGoogleSheets(orderObj) {
-  if (isSyncingToGoogle) return; // منع التكرار والإرسال المزدوج
+  if (isSyncingToGoogle || !orderObj) return; // منع التكرار والإرسال المزدوج
   isSyncingToGoogle = true;
-
-  // قراءة كافة البيانات بمرونة كاملة
-  const company = orderObj?.company || document.getElementById("companyNameInput")?.value || document.getElementById("customer-company")?.value || "";
-  const customer = orderObj?.name || document.getElementById("clientNameInput")?.value || document.getElementById("customer-name")?.value || "";
-  const phone = orderObj?.phone || document.getElementById("phoneInput")?.value || document.getElementById("customer-phone")?.value || "";
-  const location = orderObj?.location || document.getElementById("locationInput")?.value || document.getElementById("customer-location")?.value || "";
-  const details = orderObj?.details || document.getElementById("orderDetailsInput")?.value || document.getElementById("order-details")?.value || "";
-  const followup = orderObj?.followupDate || document.getElementById("followUpDateInput")?.value || document.getElementById("followup-date")?.value || "";
-  
-  const isInterested = orderObj ? orderObj.optInterested : (document.getElementById("customerInterestedCheck")?.checked || document.getElementById("opt-interested")?.checked);
-  const isMorning = orderObj ? orderObj.optManagerMorning : (document.getElementById("managerMorningCheck")?.checked || document.getElementById("opt-manager-morning")?.checked);
-  const isSendDetails = orderObj ? orderObj.optSendToManager : (document.getElementById("sendDetailsCheck")?.checked || document.getElementById("opt-send-to-manager")?.checked);
 
   // تحديد الحالة بدقة
   let status = "interested";
-  if (isSendDetails) status = "send details";
-  else if (isMorning) status = "unavailable";
-  else if (isInterested) status = "interested";
+  if (orderObj.optSendToManager) status = "send details";
+  else if (orderObj.optManagerMorning) status = "unavailable";
+  else if (orderObj.optInterested) status = "interested";
 
-  const categoryText = getCategoryLabel(orderObj?.category || document.getElementById("order-category")?.value || "new");
+  const categoryText = getCategoryLabel(orderObj.category || "new");
 
   // حمولة إدارية شاملة ومنظمة لـ Google Sheet
-  const payload = {
-    customerName: customer,
-    companyName: company,
-    phone: phone,
-    location: location,
-    orderCategory: categoryText,
-    followUpDate: followup || "غير محدد",
-    orderDetails: details,
-    optInterested: isInterested ? "نعم" : "لا",
-    optManagerMorning: isMorning ? "نعم" : "لا",
-    optSendToManager: isSendDetails ? "نعم" : "لا",
-    orderStatus: status,
-    paymentStatus: "unpaid",
-    createdAt: orderObj?.createdAt || new Date().toLocaleString("ar-SA")
-  };
+  // نستخدم URLSearchParams بدلاً من JSON لأن no-cors لا يسمح بإرسال JSON headers
+  const payload = new URLSearchParams();
+  payload.append("customerName", orderObj.name || "");
+  payload.append("companyName", orderObj.company || "");
+  payload.append("phone", orderObj.phone || "");
+  payload.append("location", orderObj.location || "");
+  payload.append("orderCategory", categoryText);
+  payload.append("followUpDate", orderObj.followupDate || "غير محدد");
+  payload.append("orderDetails", orderObj.details || "");
+  payload.append("optInterested", orderObj.optInterested ? "نعم" : "لا");
+  payload.append("optManagerMorning", orderObj.optManagerMorning ? "نعم" : "لا");
+  payload.append("optSendToManager", orderObj.optSendToManager ? "نعم" : "لا");
+  payload.append("orderStatus", status);
+  payload.append("paymentStatus", "unpaid");
+  payload.append("createdAt", orderObj.createdAt || new Date().toLocaleString("ar-SA"));
 
   fetch(webAppUrl, {
     method: "POST",
     mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: payload
   })
   .then(() => {
     console.log("Order synced once to Google Sheets successfully!");
@@ -643,12 +630,23 @@ function showDashboard(username) {
   updateWelcomeBanner(username);
   renderOrders();
   updateStats();
+
+  // بدء الساعة الحية فقط عند عرض لوحة التحكم
+  updateLiveClock();
+  if (clockIntervalId) clearInterval(clockIntervalId);
+  clockIntervalId = setInterval(updateLiveClock, 1000);
 }
 
 function showLoginPage() {
   pageDashboard.classList.add("hidden");
   pageLogin.classList.remove("hidden");
   switchTab("form-login");
+
+  // إيقاف الساعة عند تسجيل الخروج لتوفير الموارد
+  if (clockIntervalId) {
+    clearInterval(clockIntervalId);
+    clockIntervalId = null;
+  }
 }
 
 /* =========================================================
@@ -656,17 +654,17 @@ function showLoginPage() {
    ========================================================= */
 function readOrderFormData() {
   return {
-    name: (document.getElementById("clientNameInput")?.value || document.getElementById("customer-name")?.value || "").trim(),
-    company: (document.getElementById("companyNameInput")?.value || document.getElementById("customer-company")?.value || "").trim(),
-    phone: (document.getElementById("phoneInput")?.value || document.getElementById("customer-phone")?.value || "").trim(),
-    location: (document.getElementById("locationInput")?.value || document.getElementById("customer-location")?.value || "").trim(),
+    name: (document.getElementById("customer-name")?.value || "").trim(),
+    company: (document.getElementById("customer-company")?.value || "").trim(),
+    phone: (document.getElementById("customer-phone")?.value || "").trim(),
+    location: (document.getElementById("customer-location")?.value || "").trim(),
     category: document.getElementById("order-category")?.value || "new",
-    followupDate: document.getElementById("followUpDateInput")?.value || document.getElementById("followup-date")?.value || "",
+    followupDate: document.getElementById("followup-date")?.value || "",
     waTemplate: document.getElementById("wa-template")?.value || "full",
-    details: (document.getElementById("orderDetailsInput")?.value || document.getElementById("order-details")?.value || "").trim(),
-    optInterested: Boolean(document.getElementById("customerInterestedCheck")?.checked || document.getElementById("opt-interested")?.checked),
-    optManagerMorning: Boolean(document.getElementById("managerMorningCheck")?.checked || document.getElementById("opt-manager-morning")?.checked),
-    optSendToManager: Boolean(document.getElementById("sendDetailsCheck")?.checked || document.getElementById("opt-send-to-manager")?.checked)
+    details: (document.getElementById("order-details")?.value || "").trim(),
+    optInterested: Boolean(document.getElementById("opt-interested")?.checked),
+    optManagerMorning: Boolean(document.getElementById("opt-manager-morning")?.checked),
+    optSendToManager: Boolean(document.getElementById("opt-send-to-manager")?.checked)
   };
 }
 
