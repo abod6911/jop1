@@ -50,7 +50,10 @@ html[lang="en"] {
   --font-body: "Outfit", "Tajawal", sans-serif;
 }
 
-*{ box-sizing: border-box; }
+*, *::before, *::after {
+  box-sizing: border-box !important;
+  max-width: 100%;
+}
 
 html, body{
   margin:0;
@@ -62,11 +65,12 @@ html, body{
   color: var(--ink);
   font-family: var(--font-body);
   transition: background 0.25s ease, color 0.25s ease;
+  overflow-x: hidden !important;
+  -webkit-text-size-adjust: 100%;
 }
 
 body{
   position: relative;
-  overflow-x: hidden;
 }
 
 .hidden{ display:none !important; }
@@ -90,10 +94,10 @@ input, textarea, select{ font-family: inherit; }
 [data-theme="dark"] .brand-watermark { opacity: 0.015; }
 
 .stamp-ring{
-  width: 620px;
-  height:620px;
-  max-width: 90vw;
-  max-height: 90vw;
+  width: 90vw;
+  height: 90vw;
+  max-width: 500px;
+  max-height: 500px;
   border-radius:50%;
   border: 2px dashed var(--teal-deep);
   display:flex;
@@ -102,7 +106,7 @@ input, textarea, select{ font-family: inherit; }
 }
 .stamp-text{
   font-family: var(--font-display);
-  font-size: 9rem;
+  font-size: 6rem;
   color: var(--teal-deep);
 }
 
@@ -117,6 +121,7 @@ input, textarea, select{ font-family: inherit; }
   align-items:center;
   justify-content:center;
   padding: 32px 16px;
+  width: 100%;
 }
 
 .auth-wrapper{
@@ -275,6 +280,7 @@ input, textarea, select{ font-family: inherit; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  width: 100%;
 }
 
 .field{
@@ -282,6 +288,7 @@ input, textarea, select{ font-family: inherit; }
   flex-direction:column;
   gap:5px;
   margin-bottom:14px;
+  width: 100%;
 }
 .field-label{
   font-size:0.85rem;
@@ -289,6 +296,7 @@ input, textarea, select{ font-family: inherit; }
   color: var(--ink);
 }
 .field input, .field textarea, .field select{
+  width: 100%;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 11px 14px;
@@ -333,6 +341,7 @@ input, textarea, select{ font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 }
 
 [data-theme="dark"] .welcome-banner {
@@ -413,7 +422,6 @@ input, textarea, select{ font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
 }
 
 .live-clock-badge {
@@ -502,6 +510,7 @@ input, textarea, select{ font-family: inherit; }
   border-radius: var(--radius-md);
   padding: 16px;
   margin: 14px 0 18px;
+  width: 100%;
 }
 
 .classification-title {
@@ -519,6 +528,7 @@ input, textarea, select{ font-family: inherit; }
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
 .switch-item {
@@ -532,6 +542,7 @@ input, textarea, select{ font-family: inherit; }
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
+  width: 100%;
 }
 
 .switch-item:hover {
@@ -752,6 +763,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   z-index:1;
   min-height:100vh;
   padding-bottom: 60px;
+  width: 100%;
 }
 
 .topbar{
@@ -813,6 +825,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   grid-template-columns: repeat(5, 1fr);
   gap: 14px;
   margin-bottom: 24px;
+  width: 100%;
 }
 
 .stat-card {
@@ -867,6 +880,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   grid-template-columns: 1.15fr 1fr;
   gap: 24px;
   align-items:start;
+  width: 100%;
 }
 
 .card{
@@ -907,8 +921,9 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   flex-wrap:wrap;
   gap:12px;
   margin-top:8px;
+  width: 100%;
 }
-.order-actions .btn{ flex:1; min-width: 160px; }
+.order-actions .btn{ flex:1; }
 
 /* --- أدوات تصفية وبحث الطلبات --- */
 .filter-toolbar {
@@ -916,6 +931,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   flex-direction: column;
   gap: 10px;
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .search-input {
@@ -937,6 +953,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .chip {
@@ -975,6 +992,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   max-height: 600px;
   overflow-y:auto;
   padding-inline-end: 4px;
+  width: 100%;
 }
 
 .order-item{
@@ -983,6 +1001,7 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   padding: 16px 16px 4px;
   background: var(--card);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
 }
 .order-item:hover {
   transform: translateY(-2px);
@@ -1405,25 +1424,34 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
 }
 
 /* =========================================================
-   التجاوب الاحترافي للشاشات الهواتف والأجهزة الذكية (Mobile First)
+   التجاوب الشامل والديناميكي حتى 1150px (موبايل وتابلت وجوال)
    ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 1150px) {
+  /* التبديل لعمود واحد رئيسي */
   .dashboard-grid {
     grid-template-columns: 1fr !important;
     gap: 18px;
   }
+
+  /* إحصائيات بـ 3 أعمدة أو 2 عمود */
   .stats-grid {
     grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .dashboard-container {
+    padding: 0 16px;
+    margin-top: 16px;
   }
 }
 
-@media (max-width: 768px) {
-  /* التعديل الجذري للمقدمة والشريط العلوي للهواتف */
+@media (max-width: 820px) {
+  /* التنسيق الشامل لجميع الجوالات الهواتف المحمولة */
   .topbar {
     padding: 10px 14px;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
   }
   .topbar-subtitle {
     display: none;
@@ -1441,23 +1469,23 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     padding: 4px 8px;
   }
 
-  /* حاوية التحكم والترحيب */
   .dashboard-container {
-    padding: 0 12px;
-    margin-top: 14px;
+    padding: 0 10px;
+    margin-top: 12px;
   }
 
+  /* كارت الترحيب الجوال */
   .welcome-banner {
-    padding: 18px 16px;
+    padding: 18px 14px;
     flex-direction: column;
     text-align: center;
-    gap: 12px;
+    gap: 10px;
   }
   .welcome-banner-content {
     max-width: 100%;
   }
   .welcome-heading {
-    font-size: 1.4rem;
+    font-size: 1.35rem;
   }
   .welcome-subtext {
     font-size: 0.84rem;
@@ -1466,68 +1494,66 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
   .welcome-banner-decor {
     position: static;
     transform: none;
-    margin-top: 4px;
+    margin-top: 2px;
   }
   .welcome-crown-glow {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
 
-  /* شبكة الإحصائيات للهاتف */
+  /* الإحصائيات عمودين في الجوال */
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px;
+    margin-bottom: 14px;
   }
   .stat-card {
-    padding: 10px 12px;
+    padding: 10px 10px;
     gap: 8px;
   }
   .stat-icon {
-    width: 36px;
-    height: 36px;
-    font-size: 1.1rem;
+    width: 34px;
+    height: 34px;
+    font-size: 1.05rem;
     border-radius: 8px;
   }
   .stat-value {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
   .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
   }
 
-  /* النماذج وإدخالات النصوص على الهواتف منعاً للزوم والتكبير */
+  /* النماذج وإدخالات النصوص على الجوال منعاً للزوم والتكبير */
   .field input, .field textarea, .field select {
-    font-size: 16px !important; /* منع الزوم التلقائي في أيفون وأندرويد */
+    font-size: 16px !important;
     padding: 10px 12px;
   }
   .form-row {
     grid-template-columns: 1fr !important;
-    gap: 10px;
+    gap: 8px;
   }
   .card {
-    padding: 16px 14px;
+    padding: 16px 12px;
     border-radius: var(--radius-md);
   }
 
-  /* المفاتيح والتبديل */
   .switch-item {
     padding: 8px 10px;
   }
   .switch-text {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
   }
 
-  /* أزرار الإجراءات على الهواتف */
+  /* أزرار العمليات */
   .order-actions {
     flex-direction: column;
     width: 100%;
   }
   .order-actions .btn {
     width: 100%;
-    min-width: unset;
   }
 
-  /* شريط تصفية الفئات أفقي التمرير في الموبايل */
+  /* تصفية الفئات */
   .filter-chips {
     overflow-x: auto;
     flex-wrap: nowrap;
@@ -1544,46 +1570,42 @@ html[dir="rtl"] .switch-item input[type="checkbox"]:checked + .switch-slider::be
     padding: 4px 10px;
   }
 
-  /* شاشة الدخول والتسجيل */
+  /* صفحة التسجيل والدخول */
   .auth-page {
-    padding: 16px 8px;
+    padding: 12px 8px;
   }
   .auth-wrapper {
     grid-template-columns: 1fr !important;
   }
   .auth-brand {
-    padding: 28px 18px 36px;
+    padding: 24px 16px 32px;
   }
   .brand-name {
-    font-size: 2.1rem;
+    font-size: 2rem;
   }
   .auth-form-panel {
-    padding: 24px 16px;
+    padding: 20px 14px;
   }
 }
 
 @media (max-width: 480px) {
   .topbar-brand {
-    gap: 8px;
+    gap: 6px;
   }
   .topbar-title {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
   .brand-seal.small {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
   }
   .brand-seal.small span {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .btn-theme, .btn-lang {
-    padding: 5px 9px;
-    font-size: 0.78rem;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    padding: 4px 8px;
+    font-size: 0.76rem;
   }
 
   .export-btn-group {
