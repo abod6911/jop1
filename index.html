@@ -334,15 +334,25 @@
 
           <!-- أدوات البحث والتصفية -->
           <div class="filter-toolbar">
-            <input type="text" id="search-orders" class="search-input" data-i18n-ph="placeholder_search" placeholder="🔍 بحث في الطلبات..." />
-            
-            <div class="filter-chips">
-              <button class="chip active" data-filter="all" data-i18n="filter_all">الكل</button>
-              <button class="chip" data-filter="vip" data-i18n="filter_vip">🔴 VIP</button>
-              <button class="chip" data-filter="interested" data-i18n="filter_interested">🔥 مهتم</button>
-              <button class="chip" data-filter="morning" data-i18n="filter_morning">☀️ صباحاً</button>
-              <button class="chip" data-filter="manager" data-i18n="filter_manager">📩 للمدير</button>
-              <button class="chip" data-filter="followup" data-i18n="filter_followup">📅 متابعة</button>
+            <div class="search-wrapper">
+              <input type="text" id="search-orders" class="search-input" data-i18n-ph="placeholder_search" placeholder="🔍 بحث في الطلبات..." />
+              <button id="clear-search-btn" class="clear-search-btn hidden" title="مسح البحث" type="button">✕</button>
+            </div>
+
+            <div class="filter-chips-row">
+              <div class="filter-chips">
+                <button class="chip active" data-filter="all" data-i18n="filter_all">الكل</button>
+                <button class="chip" data-filter="vip" data-i18n="filter_vip">🔴 VIP</button>
+                <button class="chip" data-filter="interested" data-i18n="filter_interested">🔥 مهتم</button>
+                <button class="chip" data-filter="morning" data-i18n="filter_morning">☀️ صباحاً</button>
+                <button class="chip" data-filter="manager" data-i18n="filter_manager">📩 للمدير</button>
+                <button class="chip" data-filter="followup" data-i18n="filter_followup">📅 متابعة</button>
+              </div>
+              <select id="sort-orders-select" class="sort-select">
+                <option value="newest">🕒 الأحدث أولاً</option>
+                <option value="oldest">🕰️ الأقدم أولاً</option>
+                <option value="vip">⭐ VIP أولاً</option>
+              </select>
             </div>
           </div>
 
@@ -360,6 +370,19 @@
 
   <!-- إشعار توست (Toast Notification) -->
   <div id="toast" class="toast hidden"></div>
+
+  <!-- ===================== مودال تأكيد الحذف ===================== -->
+  <div id="delete-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-icon">🗑️</div>
+      <h3 class="modal-title">تأكيد الحذف</h3>
+      <p class="modal-msg">سيتم حذف طلب <strong id="modal-order-name"></strong> نهائياً.<br>لا يمكن التراجع عن هذا الإجراء.</p>
+      <div class="modal-actions">
+        <button id="modal-cancel-btn" class="btn btn-ghost" type="button">إلغاء</button>
+        <button id="modal-confirm-btn" class="btn btn-danger" type="button">حذف نهائياً 🗑️</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ===================== الفاتورة الرسمية والتقرير للطباعة والتصدير ===================== -->
   <div id="print-area" class="print-area"></div>

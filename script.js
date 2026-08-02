@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    إعدادات عامة وثوابت
    ========================================================= */
 
@@ -17,7 +17,9 @@ const STORAGE_KEYS = {
 };
 
 let isSyncingToGoogle = false; // لمنع التكرار والإرسال المزدوج (Single Send Lock)
-let clockIntervalId = null; // مرجع للساعة الحية لإيقافها عند تسجيل الخروج
+let clockIntervalId = null; // مرجع للساعة الحية
+let pendingDeleteId = null; // معرف الطلب المراد حذفه (تأكيد مسبق)
+let currentSort = "newest"; // ترتيب الطلبات الافتراضي
 
 /* =========================================================
    قاموس الترجمات الشامل (Arabic & English Translations)
@@ -800,98 +802,258 @@ sendWhatsappBtn.addEventListener("click", function () {
    ========================================================= */
 function printOrderReceipt(order) {
   const isAr = currentLang === "ar";
+  const dir = isAr ? "rtl" : "ltr";
 
   const followupFormatted = order.followupDate
-    ? new Date(order.followupDate).toLocaleString(isAr ? "ar-SA" : "en-US")
+    ? new Date(order.followupDate).toLocaleString(isAr ? "ar-SA" : "en-US", {
+        year: "numeric", month: "long", day: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      })
     : (isAr ? "غير محدد" : "Not specified");
 
   const categoryText = getCategoryLabel(order.category);
+  const receiptNum = `MHB-${order.id.slice(-6).toUpperCase()}`;
+  const issueDate = new Date().toLocaleDateString(isAr ? "ar-SA" : "en-US", {
+    year: "numeric", month: "long", day: "numeric"
+  });
+
+  // ألوان التصنيف
+  const catColors = {
+    vip:     { bg: "#FEE2E2", color: "#DC2626", border: "#FCA5A5" },
+    new:     { bg: "#DCFCE7", color: "#15803D", border: "#86EFAC" },
+    service: { bg: "#DBEAFE", color: "#1D4ED8", border: "#93C5FD" },
+    inquiry: { bg: "#FEF3C7", color: "#B45309", border: "#FDE68A" }
+  };
+  const cat = catColors[order.category || "new"] || catColors.new;
+
+  const badge = (active, yesLabel, noLabel) => `
+    <div style="display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;
+      background:${active ? "#F0FDF4" : "#FFF5F5"};
+      border:1px solid ${active ? "#86EFAC" : "#FECACA"};
+      flex:1;min-width:0;">
+      <span style="font-size:1rem;">${active ? "✅" : "❌"}</span>
+      <div style="font-size:0.73rem;font-weight:700;color:${active ? "#15803D" : "#DC2626"};
+        line-height:1.3;">${active ? yesLabel : noLabel}</div>
+    </div>
+  `;
 
   const printHtml = `
-    <div class="invoice-card">
-      <div class="invoice-header">
-        <div class="invoice-brand-block">
-          <div class="invoice-seal"><span>م</span></div>
-          <div class="invoice-title-text">
-            <h1>${isAr ? "مؤسسة مهاب لإدارة الخدمات والطلبات" : "Muhab Enterprise for Order Services"}</h1>
-            <p>${isAr ? "نظام إلكتروني موثّق لإدارة وتوثيق طلبات العملاء والشركات" : "Certified E-System for Customer & Enterprise Order Management"}</p>
-          </div>
-        </div>
+    <div style="
+      font-family:'Tajawal','Cairo','Segoe UI',sans-serif;
+      direction:${dir};
+      width:190mm;
+      max-height:267mm;
+      margin:0 auto;
+      background:#fff;
+      color:#16302C;
+      overflow:hidden;
+      box-sizing:border-box;
+      font-size:13px;
+    ">
 
-        <div class="invoice-header-right">
-          <div class="invoice-qr-code">
-            <div class="qr-pattern">▚▞▚</div>
-            <div class="qr-label">VERIFIED</div>
-          </div>
-          <div class="invoice-doc-meta">
-            <div class="invoice-doc-type">${isAr ? "سند تسجيل طلب رسمـي" : "Official Order Registration Receipt"}</div>
-            <div class="invoice-meta-row">${isAr ? "رقم السند:" : "Receipt No:"} <strong>MHB-${order.id.slice(-6)}</strong></div>
-            <div class="invoice-meta-row">${isAr ? "تاريخ الإصدار:" : "Issue Date:"} ${order.createdAt}</div>
-          </div>
-        </div>
-      </div>
-
-      <table class="invoice-grid-table">
-        <tr>
-          <td class="label-cell">👤 ${isAr ? "اسم العميل:" : "Customer Name:"}</td>
-          <td class="value-cell"><strong>${order.name}</strong></td>
-          <td class="label-cell">🏢 ${isAr ? "اسم الشركة:" : "Company Name:"}</td>
-          <td class="value-cell"><strong>${order.company || "-"}</strong></td>
-        </tr>
-        <tr>
-          <td class="label-cell">📞 ${isAr ? "رقم الجوال:" : "Phone Number:"}</td>
-          <td class="value-cell">${order.phone}</td>
-          <td class="label-cell">📍 ${isAr ? "الموقع / العنوان:" : "Location/Address:"}</td>
-          <td class="value-cell">${order.location}</td>
-        </tr>
-        <tr>
-          <td class="label-cell">🏷️ ${isAr ? "فئة الأولوية:" : "Priority Category:"}</td>
-          <td class="value-cell"><strong>${categoryText}</strong></td>
-          <td class="label-cell">📅 ${isAr ? "موعد المتابعة:" : "Follow-up Schedule:"}</td>
-          <td class="value-cell"><strong>${followupFormatted}</strong></td>
-        </tr>
-      </table>
-
-      <div class="invoice-section-heading">${isAr ? "تصنيف ومعلومات نوعية العميل" : "Customer Classification Summary"}</div>
-      <div class="invoice-classification-grid">
-        <div class="invoice-class-card">
-          <div class="invoice-class-title">🔥 ${isAr ? "اهتمام العميل بالفكرة" : "Customer Interest"}</div>
-          <div class="invoice-class-val ${order.optInterested ? 'yes' : 'no'}">
-            ${order.optInterested ? (isAr ? "✓ متحمس ومستعد" : "✓ Interested") : (isAr ? "✗ غير محدد" : "✗ Not specified")}
+      <!-- ====== رأس الفاتورة ====== -->
+      <div style="
+        background:linear-gradient(135deg,#0E3D3B 0%,#1A5E58 100%);
+        color:#fff;
+        padding:14px 20px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        border-radius:10px 10px 0 0;
+      ">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="
+            width:52px;height:52px;border-radius:50%;
+            background:rgba(255,255,255,0.1);
+            border:2.5px solid #E7C877;
+            display:flex;align-items:center;justify-content:center;
+            font-size:1.6rem;color:#E7C877;font-weight:900;flex-shrink:0;
+          ">م</div>
+          <div>
+            <div style="font-size:1.15rem;font-weight:900;letter-spacing:0.3px;">
+              ${isAr ? "مؤسسة مهاب لإدارة الطلبات" : "Muhab Enterprise – Order Management"}
+            </div>
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.8);margin-top:3px;">
+              ${isAr ? "نظام إدارة وتوثيق طلبات العملاء" : "Certified Customer Order Management System"}
+            </div>
           </div>
         </div>
-        <div class="invoice-class-card">
-          <div class="invoice-class-title">☀️ ${isAr ? "تواجد المدير الصباحي" : "Morning Manager Presence"}</div>
-          <div class="invoice-class-val ${order.optManagerMorning ? 'yes' : 'no'}">
-            ${order.optManagerMorning ? (isAr ? "✓ متواجد صباحاً" : "✓ Available Morning") : (isAr ? "✗ غير متاح" : "✗ Unavailable")}
+        <div style="text-align:${isAr ? "left" : "right"};
+          background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 16px;">
+          <div style="font-size:1.3rem;font-weight:900;color:#E7C877;letter-spacing:1.5px;">${receiptNum}</div>
+          <div style="font-size:0.68rem;color:rgba(255,255,255,0.9);margin-top:2px;">
+            ${isAr ? "سند تسجيل طلب رسمي" : "Official Order Registration Receipt"}
           </div>
-        </div>
-        <div class="invoice-class-card">
-          <div class="invoice-class-title">📩 ${isAr ? "إرسال التفاصيل للمدير" : "Forward to Manager"}</div>
-          <div class="invoice-class-val ${order.optSendToManager ? 'yes' : 'no'}">
-            ${order.optSendToManager ? (isAr ? "✓ مطلوب الرفع للمدير" : "✓ Send to Manager") : (isAr ? "✗ لا يتطلب" : "✗ Not required")}
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.7);margin-top:2px;">
+            ${isAr ? "تاريخ الإصدار:" : "Date:"} ${issueDate}
           </div>
         </div>
       </div>
 
-      <div class="invoice-section-heading">📝 ${isAr ? "تفاصيل ومواصفات الطلب" : "Order Specifications & Details"}</div>
-      <div class="invoice-details-card">${order.details}</div>
+      <!-- ====== شريط الحالة ====== -->
+      <div style="
+        background:#F4F7F5;
+        border-inline:2px solid #0E3D3B;
+        padding:7px 18px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        font-size:0.75rem;
+        color:#52685F;
+      ">
+        <span>📋 ${isAr ? "رقم الطلب:" : "Order No:"} <strong style="color:#0E3D3B;font-size:0.85rem;">${receiptNum}</strong></span>
+        <span style="
+          padding:3px 14px;border-radius:999px;font-weight:700;font-size:0.72rem;
+          background:${cat.bg};color:${cat.color};border:1px solid ${cat.border};
+        ">${categoryText}</span>
+        <span>🕒 ${order.createdAt}</span>
+      </div>
 
-      <div class="invoice-footer-block">
-        <div class="invoice-sign-box">
-          <div>${isAr ? "توقيع الموظف / المسؤول المختص" : "Agent Authorized Signature"}</div>
-          <div class="invoice-sign-line"></div>
+      <!-- ====== جسم الفاتورة ====== -->
+      <div style="border:2px solid #0E3D3B;border-top:none;border-radius:0 0 10px 10px;padding:14px 18px;">
+
+        <!-- بيانات العميل -->
+        <div style="
+          display:flex;align-items:center;gap:8px;
+          margin-bottom:8px;
+        ">
+          <span style="background:#0E3D3B;color:#E7C877;border-radius:5px;
+            padding:3px 10px;font-size:0.72rem;font-weight:900;">
+            👤 ${isAr ? "بيانات العميل" : "Client Information"}
+          </span>
+          <div style="flex:1;height:1px;background:#C6952E;"></div>
         </div>
 
-        <div class="invoice-watermark-stamp">
-          <div>مؤسسة مهاب</div>
-          <div>معتمد رسمياً</div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:0.8rem;">
+          <tr>
+            <td style="padding:6px 10px;background:#F4F7F5;font-weight:700;color:#0E3D3B;
+              width:18%;border:1px solid #DDE6E1;white-space:nowrap;">
+              ${isAr ? "اسم العميل" : "Customer"}
+            </td>
+            <td style="padding:6px 10px;font-weight:800;color:#0E3D3B;
+              width:32%;border:1px solid #DDE6E1;font-size:0.88rem;">
+              ${order.name}
+            </td>
+            <td style="padding:6px 10px;background:#F4F7F5;font-weight:700;color:#0E3D3B;
+              width:18%;border:1px solid #DDE6E1;white-space:nowrap;">
+              ${isAr ? "اسم الشركة" : "Company"}
+            </td>
+            <td style="padding:6px 10px;color:#16302C;width:32%;border:1px solid #DDE6E1;">
+              ${order.company || "-"}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:6px 10px;background:#F4F7F5;font-weight:700;color:#0E3D3B;
+              border:1px solid #DDE6E1;white-space:nowrap;">
+              ${isAr ? "رقم الجوال" : "Phone"}
+            </td>
+            <td style="padding:6px 10px;color:#16302C;border:1px solid #DDE6E1;font-weight:600;">${order.phone}</td>
+            <td style="padding:6px 10px;background:#F4F7F5;font-weight:700;color:#0E3D3B;
+              border:1px solid #DDE6E1;white-space:nowrap;">
+              ${isAr ? "الموقع" : "Location"}
+            </td>
+            <td style="padding:6px 10px;color:#16302C;border:1px solid #DDE6E1;">${order.location}</td>
+          </tr>
+          <tr>
+            <td style="padding:6px 10px;background:#F4F7F5;font-weight:700;color:#0E3D3B;
+              border:1px solid #DDE6E1;white-space:nowrap;">
+              ${isAr ? "موعد المتابعة" : "Follow-up"}
+            </td>
+            <td colspan="3" style="padding:6px 10px;color:#16302C;
+              border:1px solid #DDE6E1;font-weight:600;">${followupFormatted}</td>
+          </tr>
+        </table>
+
+        <!-- تفاصيل الطلب -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="background:#0E3D3B;color:#E7C877;border-radius:5px;
+            padding:3px 10px;font-size:0.72rem;font-weight:900;">
+            📝 ${isAr ? "تفاصيل الطلب" : "Order Details"}
+          </span>
+          <div style="flex:1;height:1px;background:#C6952E;"></div>
+        </div>
+        <div style="
+          background:#F8FAFB;
+          border:1px solid #DDE6E1;
+          border-radius:6px;
+          padding:10px 14px;
+          font-size:0.82rem;
+          line-height:1.7;
+          color:#16302C;
+          margin-bottom:12px;
+          min-height:55px;
+          max-height:85px;
+          overflow:hidden;
+          white-space:pre-wrap;
+        ">${order.details}</div>
+
+        <!-- تصنيف العميل -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+          <span style="background:#0E3D3B;color:#E7C877;border-radius:5px;
+            padding:3px 10px;font-size:0.72rem;font-weight:900;">
+            📊 ${isAr ? "تصنيف ومؤشرات العميل" : "Customer Classification"}
+          </span>
+          <div style="flex:1;height:1px;background:#C6952E;"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          ${badge(
+            order.optInterested,
+            isAr ? "🔥 مهتم بالفكرة" : "🔥 Interested",
+            isAr ? "🔥 غير مهتم" : "🔥 Not Interested"
+          )}
+          ${badge(
+            order.optManagerMorning,
+            isAr ? "☀️ مدير متاح صباحاً" : "☀️ Manager Available",
+            isAr ? "☀️ مدير غير متاح" : "☀️ Manager Unavailable"
+          )}
+          ${badge(
+            order.optSendToManager,
+            isAr ? "📩 مطلوب رفع للمدير" : "📩 Send to Manager",
+            isAr ? "📩 لا يتطلب رفع" : "📩 No escalation"
+          )}
         </div>
 
-        <div class="invoice-sign-box">
-          <div>${isAr ? "اعتماد قسم الإدارة والختم" : "Management Seal & Approval"}</div>
-          <div class="invoice-sign-line"></div>
+        <!-- تذييل الفاتورة -->
+        <div style="
+          border-top:2px solid #C6952E;
+          padding-top:12px;
+          display:flex;
+          align-items:flex-end;
+          justify-content:space-between;
+          position:relative;
+        ">
+          <div style="text-align:center;font-size:0.72rem;color:#0E3D3B;font-weight:700;">
+            <div>${isAr ? "توقيع الموظف المختص" : "Authorized Agent Signature"}</div>
+            <div style="width:130px;border-bottom:1.5px dashed #0E3D3B;margin-top:24px;"></div>
+          </div>
+
+          <!-- ختم المؤسسة -->
+          <div style="
+            width:74px;height:74px;border-radius:50%;
+            border:2px dashed #C6952E;
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            color:#C6952E;transform:rotate(-15deg);
+            position:absolute;top:50%;left:50%;
+            transform:translate(-50%,-50%) rotate(-15deg);
+          ">
+            <div style="font-size:0.95rem;font-weight:900;">${isAr ? "مهاب" : "Muhab"}</div>
+            <div style="font-size:0.62rem;font-weight:700;">${isAr ? "معتمد ✓" : "Verified ✓"}</div>
+          </div>
+
+          <div style="text-align:center;font-size:0.72rem;color:#0E3D3B;font-weight:700;">
+            <div>${isAr ? "اعتماد الإدارة والختم" : "Management Approval & Seal"}</div>
+            <div style="width:130px;border-bottom:1.5px dashed #0E3D3B;margin-top:24px;"></div>
+          </div>
         </div>
+
+      </div>
+
+      <!-- ملاحظة سفلية -->
+      <div style="text-align:center;font-size:0.6rem;color:#9BB0AA;margin-top:7px;">
+        ${isAr
+          ? "صادر إلكترونياً عبر نظام مهاب لإدارة الطلبات | جميع الحقوق محفوظة"
+          : "Electronically issued by Muhab Order Management System | All rights reserved"}
       </div>
     </div>
   `;
@@ -899,6 +1061,7 @@ function printOrderReceipt(order) {
   printAreaEl.innerHTML = printHtml;
   window.print();
 }
+
 
 /* =========================================================
    تصدير التقرير التنفيذي الشامل لجميع الطلبات كـ PDF/طباعة
@@ -1025,6 +1188,28 @@ if (exportReportBtn) {
 if (searchOrdersInput) {
   searchOrdersInput.addEventListener("input", function (e) {
     searchQuery = e.target.value.toLowerCase().trim();
+    const clearBtn = document.getElementById("clear-search-btn");
+    if (clearBtn) clearBtn.classList.toggle("hidden", !e.target.value);
+    renderOrders();
+  });
+}
+
+// زر مسح البحث
+const clearSearchBtn = document.getElementById("clear-search-btn");
+if (clearSearchBtn) {
+  clearSearchBtn.addEventListener("click", () => {
+    searchOrdersInput.value = "";
+    searchQuery = "";
+    clearSearchBtn.classList.add("hidden");
+    renderOrders();
+  });
+}
+
+// ترتيب الطلبات
+const sortSelectEl = document.getElementById("sort-orders-select");
+if (sortSelectEl) {
+  sortSelectEl.addEventListener("change", function () {
+    currentSort = this.value;
     renderOrders();
   });
 }
@@ -1044,7 +1229,9 @@ document.querySelectorAll(".chip").forEach(chip => {
 function renderOrders() {
   let orders = getOrders();
   const t = TRANSLATIONS[currentLang];
+  const today = new Date().toDateString();
 
+  // بحث
   if (searchQuery) {
     orders = orders.filter(o =>
       (o.name && o.name.toLowerCase().includes(searchQuery)) ||
@@ -1055,6 +1242,7 @@ function renderOrders() {
     );
   }
 
+  // فلتر
   if (activeFilter === "vip") {
     orders = orders.filter(o => o.category === "vip");
   } else if (activeFilter === "interested") {
@@ -1067,17 +1255,37 @@ function renderOrders() {
     orders = orders.filter(o => o.followupDate);
   }
 
+  // ترتيب
+  if (currentSort === "oldest") {
+    orders = [...orders].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  } else if (currentSort === "vip") {
+    orders = [...orders].sort((a, b) => (a.category === "vip" ? -1 : 1));
+  } else {
+    // newest first (default) – keep original reverse order
+    orders = [...orders].reverse();
+  }
+
   ordersEmptyEl.classList.toggle("hidden", orders.length > 0);
   ordersListEl.innerHTML = "";
 
   orders.forEach(order => {
     const clone = orderItemTemplate.content.cloneNode(true);
+    const isToday = order.followupDate &&
+      new Date(order.followupDate).toDateString() === today;
 
     clone.querySelector(".order-item-name").textContent = order.name;
     clone.querySelector(".order-item-company").textContent = order.company ? `🏢 ${order.company}` : "";
     clone.querySelector(".order-item-date").textContent = order.createdAt;
     clone.querySelector(".order-item-phone").textContent = order.phone;
     clone.querySelector(".order-item-location").textContent = order.location;
+
+    // شارة المتابعة اليوم
+    if (isToday) {
+      const todayBadge = document.createElement("span");
+      todayBadge.className = "today-followup-badge";
+      todayBadge.textContent = "⚡ متابعة اليوم!";
+      clone.querySelector(".order-item-date").after(todayBadge);
+    }
 
     // شارة فئة الأولوية
     const catBadge = clone.querySelector(".category-badge");
@@ -1137,7 +1345,7 @@ function renderOrders() {
 
     if (btnDel) {
       btnDel.textContent = t.btn_delete;
-      btnDel.addEventListener("click", () => deleteOrder(order.id));
+      btnDel.addEventListener("click", () => confirmDeleteOrder(order.id, order.name));
     }
 
     ordersListEl.appendChild(clone);
@@ -1151,10 +1359,53 @@ function createTagBadge(text, isActive) {
   return span;
 }
 
+/* =========================================================
+   حذف الطلب بتأكيد عبر مودال
+   ========================================================= */
+/* فتح مودال تأكيد الحذف */
+const deleteModalEl      = document.getElementById("delete-modal");
+const modalOrderNameEl   = document.getElementById("modal-order-name");
+const modalCancelBtn     = document.getElementById("modal-cancel-btn");
+const modalConfirmBtn    = document.getElementById("modal-confirm-btn");
+
+function confirmDeleteOrder(orderId, orderName) {
+  pendingDeleteId = orderId;
+  if (modalOrderNameEl) modalOrderNameEl.textContent = orderName;
+  if (deleteModalEl) deleteModalEl.classList.remove("hidden");
+}
+
+if (modalCancelBtn) {
+  modalCancelBtn.addEventListener("click", () => {
+    pendingDeleteId = null;
+    deleteModalEl.classList.add("hidden");
+  });
+}
+
+if (modalConfirmBtn) {
+  modalConfirmBtn.addEventListener("click", () => {
+    if (pendingDeleteId) {
+      deleteOrder(pendingDeleteId);
+      pendingDeleteId = null;
+    }
+    deleteModalEl.classList.add("hidden");
+  });
+}
+
+// إغلاق المودال لما يضغط خارجه
+if (deleteModalEl) {
+  deleteModalEl.addEventListener("click", (e) => {
+    if (e.target === deleteModalEl) {
+      pendingDeleteId = null;
+      deleteModalEl.classList.add("hidden");
+    }
+  });
+}
+
 function deleteOrder(orderId) {
   const orders = getOrders().filter(o => o.id !== orderId);
   saveOrders(orders);
   renderOrders();
+  updateStats();
 }
 
 /* =========================================================
